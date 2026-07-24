@@ -554,6 +554,17 @@
 				data.reservations.forEach(r => {
 					const dep = (parseFloat(r.deposit_amount) || (parseFloat(r.total_amount) * 0.10)).toFixed(2);
 					const rem = (parseFloat(r.remaining_balance) || (parseFloat(r.total_amount) * 0.90)).toFixed(2);
+					
+					// Delivery status check
+					const isDelivered = r.checked_out_at && r.checked_out_at !== '0000-00-00 00:00:00';
+					const deliverBadge = isDelivered 
+						? `<div style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80; padding:6px 12px; border-radius:8px; font-size:11.5px; font-weight:800; margin-top:10px; display:inline-block; width:100%; text-align:center;">
+								✔️ Vehículo Entregado
+							</div>`
+						: ( (r.reservation_status === 'CONFIRMED' || r.reservation_status === 'confirmed')
+							? `<button onclick="deliverVehicle(${r.id})" class="btn-action" style="padding:8px 12px; margin-top:10px; font-size:12px; background:#3b82f6; box-shadow:none;">🚚 Marcar como Entregado</button>`
+							: '' );
+
 					const card = `
 						<div class="res-card">
 							${r.image_url ? `<img src="${r.image_url}" alt="${r.vehicle_name || 'Car'}" style="width:100%; height:110px; object-fit:contain; background:rgba(0,0,0,0.3); padding:6px; border-radius:10px; margin-bottom:12px; border:1px solid var(--border-color);">` : ''}
@@ -570,15 +581,39 @@
 								<div>Depósito 10%: <strong style="color:#4ade80;">$${dep} USD</strong></div>
 								<div style="font-size:12px; color:var(--text-secondary);">Saldo 90%: <strong style="color:#ef4444;">$${rem} USD</strong></div>
 							</div>
+							${deliverBadge}
 						</div>
 					`;
 					if (r.reservation_status === 'draft' || r.reservation_status === 'requested' || r.reservation_status === 'hold') colNew += card;
 					else if (r.reservation_status === 'waiting_for_customer' || r.reservation_status === 'APPROVED') colWaiting += card;
-					else if (r.reservation_status === 'CONFIRMED' || r.reservation_status === 'confirmed') colConfirmed += card;
+					else if (r.reservation_status === 'CONFIRMED' || r.reservation_status === 'confirmed' || r.reservation_status === 'checked_out') colConfirmed += card;
 				});
 				document.getElementById('colNew').innerHTML = colNew || `<p style="color:var(--text-secondary); font-size:13px;">${t.noItems}</p>`;
 				document.getElementById('colWaiting').innerHTML = colWaiting || `<p style="color:var(--text-secondary); font-size:13px;">${t.noItems}</p>`;
 				document.getElementById('colConfirmed').innerHTML = colConfirmed || `<p style="color:var(--text-secondary); font-size:13px;">${t.noItems}</p>`;
+			}
+		}
+
+		async function deliverVehicle(id) {
+			if (!confirm('¿Estás seguro de que deseas marcar este vehículo como entregado al cliente?')) {
+				return;
+			}
+			const base = window.location.pathname.includes('/ramirezrentacar/') 
+				? '/ramirezrentacar/wp-json/ramirez-paypal/v1' 
+				: '/wp-json/ramirez-paypal/v1';
+
+			const res = await fetch(`${base}/admin/reservations/${id}/deliver`, {
+				method: 'POST',
+				headers: { 
+					'Authorization': `Bearer ${authToken}`,
+					'Content-Type': 'application/json' 
+				}
+			});
+			const data = await res.json();
+			if (data.success) {
+				loadReservations();
+			} else {
+				alert(data.message || 'Error al procesar la entrega.');
 			}
 		}
 

@@ -62,6 +62,12 @@ class Routes {
 			'callback'            => [ $this, 'get_health' ],
 			'permission_callback' => [ $this, 'check_admin_permission' ]
 		] );
+
+		register_rest_route( $namespace, '/admin/reservations/(?P<id>\d+)/deliver', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'deliver_reservation' ],
+			'permission_callback' => [ $this, 'check_agent_permission' ]
+		] );
 	}
 
 	public function create_order( $request ) {
@@ -105,5 +111,39 @@ class Routes {
 
 	public function check_refund_permission() {
 		return current_user_can( \BreakTheMold\RamirezPayPal\Core\Capabilities::REFUND_PAYMENT );
+	}
+
+	public function check_agent_permission() {
+		return is_user_logged_in();
+	}
+
+	public function deliver_reservation( $request ) {
+		$id = intval( $request->get_param( 'id' ) );
+		global $wpdb;
+		$table = $wpdb->prefix . 'rrc_reservations';
+		
+		$res = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id ) );
+		if ( ! $res ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Reserva no encontrada.' ], 404 );
+		}
+		
+		$wpdb->update( $table, [
+			'checked_out_at'     => current_time( 'mysql' ),
+			'reservation_status' => 'checked_out'
+		], [ 'id' => $id ] );
+		
+		// Log audit
+		$wpdb->insert( $wpdb->prefix . 'rrc_audit_log', [
+			'actor_user_id'   => get_current_user_id(),
+			'actor_type'      => 'user',
+			'action'          => 'DELIVER_VEHICLE',
+			'entity_type'     => 'reservation',
+			'entity_id'       => $id,
+			'old_values_json' => json_encode( [ 'checked_out_at' => $res->checked_out_at, 'reservation_status' => $res->reservation_status ] ),
+			'new_values_json' => json_encode( [ 'checked_out_at' => current_time( 'mysql' ), 'reservation_status' => 'checked_out' ] ),
+			'created_at'      => current_time( 'mysql' )
+		] );
+		
+		return rest_ensure_response( [ 'success' => true, 'message' => 'Vehículo marcado como entregado.' ] );
 	}
 }
