@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ramirez Operations App</title>
+	<link rel="icon" type="image/png" href="../wp-content/uploads/2026/icon.png">
+	<link rel="shortcut icon" type="image/png" href="../wp-content/uploads/2026/icon.png">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,800&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-main: #07090e;
+			--bg-sidebar: #0d111a;
+			--bg-card: rgba(18, 24, 38, 0.7);
+			--bg-card-hover: rgba(30, 41, 59, 0.8);
+			--brand-red: #E8272C;
+			--brand-red-glow: rgba(232, 39, 44, 0.4);
+			--brand-accent: #E8272C;
+			--brand-green: #10b981;
+			--text-primary: #f8fafc;
+			--text-secondary: #94a3b8;
+			--border-color: rgba(255, 255, 255, 0.08);
+			--radius-xl: 24px;
+			--radius-lg: 16px;
+			--radius-md: 12px;
+			--shadow-glow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+			--glass-border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter Tight', sans-serif; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+		body { background: radial-gradient(circle at top right, #1a080a 0%, #07090e 60%); color: var(--text-primary); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+		.app-container { display: flex; min-height: 100vh; }
+
+		/* SIDEBAR */
+		.sidebar { width: 280px; background: rgba(13, 17, 26, 0.85); backdrop-filter: blur(16px); border-right: var(--glass-border); padding: 32px 24px; display: flex; flex-direction: column; }
+		
+		.user-welcome-card { background: linear-gradient(135deg, rgba(232, 39, 44, 0.15) 0%, rgba(18, 24, 38, 0.6) 100%); border: 1px solid rgba(232, 39, 44, 0.2); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 32px; }
+		.user-welcome-title { font-size: 20px; font-weight: 900; color: #fff; line-height: 1.2; }
+		.user-welcome-sub { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+
+		.sidebar-title { font-weight: 900; font-size: 20px; text-transform: uppercase; margin-bottom: 24px; letter-spacing: -0.5px; color: #fff; display: flex; align-items: center; gap: 10px; }
+		.sidebar-title span { color: var(--brand-red); text-shadow: 0 0 12px var(--brand-red-glow); }
+		
+		.sidebar-section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #475569; letter-spacing: 1px; margin: 20px 0 10px 12px; }
+		
+		.nav-list { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+		.nav-item a { display: flex; align-items: center; gap: 14px; color: var(--text-secondary); text-decoration: none; padding: 14px 18px; border-radius: var(--radius-md); font-weight: 700; font-size: 14px; border: 1px solid transparent; }
+		.nav-item.active a, .nav-item a:hover { background: rgba(232, 39, 44, 0.15); color: #fff; border: 1px solid rgba(232, 39, 44, 0.3); box-shadow: 0 8px 20px -6px var(--brand-red-glow); }
+
+		/* MAIN CONTENT */
+		.main-content { flex: 1; display: flex; flex-direction: column; background: transparent; }
+		.topbar { background: rgba(13, 17, 26, 0.6); backdrop-filter: blur(12px); border-bottom: var(--glass-border); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+		
+		.search-input { background: rgba(18, 24, 38, 0.8); border: var(--glass-border); color: #fff; padding: 12px 22px; border-radius: 50px; width: 340px; font-size: 14px; outline: none; }
+		.search-input:focus { border-color: var(--brand-red); box-shadow: 0 0 15px var(--brand-red-glow); }
+
+		.lang-switch { display: flex; background: rgba(18, 24, 38, 0.8); border-radius: 50px; padding: 4px; border: var(--glass-border); gap: 4px; }
+		.lang-btn { background: none; border: none; color: var(--text-secondary); padding: 8px 16px; border-radius: 50px; font-weight: 800; font-size: 12px; cursor: pointer; }
+		.lang-btn.active { background: var(--brand-red); color: #fff; box-shadow: 0 0 15px var(--brand-red-glow); }
+
+		.content-area { padding: 40px; flex: 1; }
+		.page-title { font-weight: 900; font-size: 32px; margin-bottom: 32px; letter-spacing: -0.8px; background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+		/* STATS GRID */
+		.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-bottom: 40px; }
+		.stat-card { background: var(--bg-card); backdrop-filter: blur(16px); border: var(--glass-border); border-radius: var(--radius-xl); padding: 28px; box-shadow: var(--shadow-glow); }
+		.stat-card:hover { border-color: rgba(232, 39, 44, 0.4); transform: translateY(-4px); box-shadow: 0 20px 40px -10px var(--brand-red-glow); }
+		.stat-label { font-size: 12px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; }
+		.stat-value { font-size: 36px; font-weight: 900; color: #fff; margin-top: 12px; letter-spacing: -1px; }
+
+		/* KANBAN BOARD */
+		.kanban-board { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 20px; }
+		.kanban-col { background: rgba(13, 17, 26, 0.7); backdrop-filter: blur(12px); border: var(--glass-border); border-radius: var(--radius-xl); padding: 24px; min-width: 330px; flex: 1; }
+		.col-header { font-weight: 800; font-size: 13px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 24px; letter-spacing: 1px; display: flex; justify-content: space-between; }
+		
+		.res-card { background: var(--bg-card); backdrop-filter: blur(16px); border: var(--glass-border); border-radius: var(--radius-lg); padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow-glow); }
+		.res-card:hover { border-color: var(--brand-red); transform: translateY(-2px); }
+		.res-ref { font-weight: 900; color: var(--brand-red); font-size: 16px; letter-spacing: 0.5px; }
+		.res-cust { font-weight: 800; margin-top: 6px; font-size: 16px; color: #fff; }
+		.res-details { font-size: 13px; color: var(--text-secondary); margin-top: 10px; line-height: 1.5; }
+		.res-price { font-weight: 900; color: var(--brand-green); margin-top: 14px; font-size: 18px; }
+
+		/* BUTTONS */
+		.btn-action { display: inline-block; width: 100%; text-align: center; background: var(--brand-red); color: #fff; font-weight: 800; padding: 14px; border-radius: var(--radius-md); text-decoration: none; margin-top: 14px; border: none; cursor: pointer; box-shadow: 0 8px 20px -4px var(--brand-red-glow); }
+		.btn-approve { background: var(--brand-green); box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.35); }
+		.btn-reject { background: #b91c1c; box-shadow: 0 8px 20px -4px rgba(185, 28, 28, 0.35); }
+		.btn-action:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+		/* MODAL */
+		.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(12px); align-items: center; justify-content: center; z-index: 1000; }
+		.modal-content { background: #0d111a; border: var(--glass-border); border-radius: var(--radius-xl); width: 100%; max-width: 540px; padding: 36px; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.9); }
+		.modal-title { font-weight: 900; font-size: 24px; margin-bottom: 24px; color: #fff; }
+
+		/* LOGIN VIEW */
+		.login-screen { position: fixed; inset: 0; background: radial-gradient(circle at center, #1e090b 0%, #07090e 70%); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+		.login-card { background: rgba(13, 17, 26, 0.85); backdrop-filter: blur(20px); border: var(--glass-border); padding: 52px; border-radius: var(--radius-xl); width: 100%; max-width: 440px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); }
+		.form-group { margin-bottom: 22px; text-align: left; }
+		.form-group label { display: block; font-size: 12px; font-weight: 800; margin-bottom: 8px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; }
+		.form-group input { width: 100%; padding: 16px; background: rgba(18, 24, 38, 0.9); border: var(--glass-border); color: #fff; border-radius: var(--radius-md); font-size: 15px; outline: none; }
+		.form-group input:focus { border-color: var(--brand-red); box-shadow: 0 0 15px var(--brand-red-glow); }
+	</style>
+</head>
+<body>
+
+	<!-- LOGIN SCREEN -->
+	<div id="loginScreen" class="login-screen">
+		<div class="login-card">
+			<img src="../wp-content/uploads/2026/R-Rent-a-car-logo-app.png" alt="Ramirez Rent A Car" style="max-height: 55px; margin-bottom: 16px; object-fit: contain;">
+			<p id="t_loginSub" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 32px;">Plataforma Administrativa de Alquiler</p>
+			
+			<div class="lang-switch" style="justify-content: center; margin-bottom: 28px; width: fit-content; margin-left: auto; margin-right: auto;">
+				<button class="lang-btn active" onclick="setLang('es')">ES</button>
+				<button class="lang-btn" onclick="setLang('en')">EN</button>
+			</div>
+
+			<form id="loginForm">
+				<div class="form-group">
+					<label id="t_loginUserLabel">Usuario o Correo</label>
+					<input type="text" id="loginUser" required placeholder="admin">
+				</div>
+				<div class="form-group">
+					<label id="t_loginPassLabel">Contraseña</label>
+					<input type="password" id="loginPass" required placeholder="••••••••">
+				</div>
+				<button type="submit" id="t_loginBtn" class="btn-action" style="padding: 16px; margin-top: 10px; font-size: 16px;">Iniciar Sesión</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- MAIN APP WRAPPER -->
+	<div id="appWrapper" class="app-container" style="display: none;">
+		<aside class="sidebar">
+			<div class="sidebar-title" style="margin-bottom: 28px; padding-left: 0;">
+				<img src="../wp-content/uploads/2026/R-Rent-a-car-logo-app.png" alt="Ramirez Rent A Car" style="max-height: 48px; width: auto; object-fit: contain;">
+			</div>
+
+			<!-- WELCOME CARD LIKE QUANTIX -->
+			<div class="user-welcome-card">
+				<div class="user-welcome-title">Bienvenido,<br><span id="userDisplayNameCard">Asesor</span></div>
+				<div class="user-welcome-sub">Ramirez Operations Agent</div>
+			</div>
+
+			<div class="sidebar-section-label">Navegación</div>
+			<ul class="nav-list">
+				<li class="nav-item active"><a href="#" onclick="showTab('dashboard')">📊 <span id="t_navDashboard">Dashboard</span></a></li>
+				<li class="nav-item"><a href="#" onclick="showTab('reservations')">🚗 <span id="t_navReservations">Reservas</span></a></li>
+				<li class="nav-item"><a href="#" onclick="showTab('fleet')">🚘 <span id="t_navFleet">Flota y Unidades</span></a></li>
+				<li class="nav-item"><a href="#" onclick="showTab('users')">👥 <span id="t_navUsers">Usuarios</span></a></li>
+				<li class="nav-item"><a href="#" onclick="showTab('audit')">🛡️ <span id="t_navAudit">Auditoría</span></a></li>
+			</ul>
+			<button onclick="logout()" id="t_logoutBtn" style="background: none; border: none; color: var(--brand-red); font-weight: 800; cursor: pointer; text-align: left; margin-top: auto; padding: 12px 0;">← Cerrar Sesión</button>
+		</aside>
+
+		<main class="main-content">
+			<header class="topbar">
+				<input type="text" class="search-input" id="t_searchPlaceholder" placeholder="Buscar por referencia o cliente...">
+				
+				<div style="display: flex; align-items: center; gap: 20px;">
+					<!-- Language Selector -->
+					<div class="lang-switch">
+						<button id="btnLangEs" class="lang-btn active" onclick="setLang('es')">ES</button>
+						<button id="btnLangEn" class="lang-btn" onclick="setLang('en')">EN</button>
+					</div>
+
+					<div class="user-badge">
+						<span id="userDisplayName" style="font-weight: 800; color: #fff;">Asesor Operativo</span>
+					</div>
+				</div>
+			</header>
+
+			<section id="tabDashboard" class="content-area">
+				<h1 id="t_dashTitle" class="page-title">Panel de Control Operativo</h1>
+				
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div id="t_statNew" class="stat-label">Nuevas Solicitudes</div>
+						<div id="statNew" class="stat-value">0</div>
+					</div>
+					<div class="stat-card">
+						<div id="t_statReview" class="stat-label">En Revisión</div>
+						<div id="statReview" class="stat-value">0</div>
+					</div>
+					<div class="stat-card">
+						<div id="t_statPayment" class="stat-label">Esperando Pago</div>
+						<div id="statPayment" class="stat-value">0</div>
+					</div>
+					<div class="stat-card">
+						<div id="t_statConfirmed" class="stat-label">Confirmadas / Pagadas</div>
+						<div id="statConfirmed" class="stat-value">0</div>
+					</div>
+				</div>
+
+				<h2 id="t_actionRequiredHeader" style="font-size: 20px; font-weight: 900; margin-bottom: 20px;">Acción Requerida</h2>
+				<div id="actionRequiredList"></div>
+			</section>
+
+			<section id="tabReservations" class="content-area" style="display: none;">
+				<h1 id="t_resTitle" class="page-title">Bandeja de Reservas (Kanban)</h1>
+				<div class="kanban-board">
+					<div class="kanban-col">
+						<div id="t_colNewHeader" class="col-header">Nuevas / Pendientes</div>
+						<div id="colNew"></div>
+					</div>
+					<div class="kanban-col">
+						<div id="t_colWaitingHeader" class="col-header">Esperando Pago</div>
+						<div id="colWaiting"></div>
+					</div>
+					<div class="kanban-col">
+						<div id="t_colConfirmedHeader" class="col-header">Confirmadas</div>
+						<div id="colConfirmed"></div>
+					</div>
+				</div>
+			</section>
+
+			<section id="tabFleet" class="content-area" style="display: none;">
+				<h1 id="t_fleetTitle" class="page-title">Gestión de Flota</h1>
+				<div id="fleetList"></div>
+			</section>
+
+			<section id="tabUsers" class="content-area" style="display: none;">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+					<h1 id="t_usersTitle" class="page-title" style="margin: 0;">Gestión de Usuarios Operativos</h1>
+					<button onclick="openCreateUserModal()" id="t_createUserBtn" class="btn-action" style="width: auto; padding: 12px 24px; margin: 0;">+ Nuevo Usuario</button>
+				</div>
+				<div id="usersList"></div>
+			</section>
+
+			<section id="tabAudit" class="content-area" style="display: none;">
+				<h1 id="t_auditTitle" class="page-title">Registro de Auditoría</h1>
+				<div id="auditLogList"></div>
+			</section>
+		</main>
+	</div>
+
+	<!-- DECISION MODAL -->
+	<div id="decisionModal" class="modal-overlay">
+		<div class="modal-content">
+			<h3 id="modalTitle" class="modal-title">Acción de Reserva</h3>
+			<div class="form-group">
+				<label id="t_modalReasonLabel">Comentario / Motivo Interno</label>
+				<textarea id="modalReason" style="width: 100%; height: 90px; padding: 12px; background: #1e293b; border-radius: 10px; border: 1px solid var(--border-color); color: #fff; outline: none;"></textarea>
+			</div>
+			<div style="display: flex; gap: 12px; margin-top: 24px;">
+				<button onclick="closeModal()" id="t_modalCancelBtn" style="flex: 1; padding: 14px; border: none; border-radius: var(--radius-md); background: #334155; color: #fff; font-weight: 800; cursor: pointer;">Cancelar</button>
+				<button id="modalConfirmBtn" class="btn-action" style="flex: 1; margin-top: 0; padding: 14px;">Confirmar Acción</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- CREATE USER MODAL -->
+	<div id="createUserModal" class="modal-overlay">
+		<div class="modal-content">
+			<h3 id="t_modalUserTitle" class="modal-title">Crear Nuevo Usuario Operativo</h3>
+			<form id="createUserForm">
+				<div class="form-group">
+					<label id="t_lblUser">Nombre de Usuario</label>
+					<input type="text" id="newUsername" required placeholder="ej: juan.asesor">
+				</div>
+				<div class="form-group">
+					<label id="t_lblEmail">Correo Electrónico</label>
+					<input type="email" id="newEmail" required placeholder="juan@ramirezrentacar.com">
+				</div>
+				<div class="form-group">
+					<label id="t_lblPass">Contraseña Inicial</label>
+					<input type="password" id="newPassword" required placeholder="••••••••">
+				</div>
+				<div class="form-group">
+					<label id="t_lblRole">Rol de Acceso</label>
+					<select id="newRole" style="width: 100%; padding: 14px; background: #1e293b; border: 1px solid var(--border-color); color: #fff; border-radius: var(--radius-md); font-size: 15px; outline: none;">
+						<option value="rrc_reservation_agent">Asesor de Reservas (Reservation Agent)</option>
+						<option value="rrc_manager">Gerente de Operaciones (Manager)</option>
+						<option value="rrc_fleet_agent">Gestor de Flota (Fleet Agent)</option>
+						<option value="rrc_finance">Finanzas (Finance)</option>
+						<option value="rrc_viewer">Solo Lectura (Viewer)</option>
+					</select>
+				</div>
+				<div style="display: flex; gap: 12px; margin-top: 24px;">
+					<button type="button" onclick="closeUserModal()" id="t_modalUserCancelBtn" style="flex: 1; padding: 14px; border: none; border-radius: var(--radius-md); background: #334155; color: #fff; font-weight: 800; cursor: pointer;">Cancelar</button>
+					<button type="submit" id="t_modalUserSubmitBtn" class="btn-action" style="flex: 1; margin-top: 0; padding: 14px;">Crear Usuario</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		const API_BASE = '/ramirezrentacar/wp-json/ramirez-rent-a-car/v1/app';
+		let authToken = localStorage.getItem('rrc_token') || '';
+		let currentLang = localStorage.getItem('rrc_lang') || 'es';
+		let activeResId = null;
+		let currentAction = '';
+
+		const i18n = {
+			es: {
+				loginSub: "Plataforma Administrativa de Alquiler",
+				loginUserLabel: "Usuario o Correo",
+				loginPassLabel: "Contraseña",
+				loginBtn: "Iniciar Sesión",
+				navDashboard: "Dashboard",
+				navReservations: "Reservas",
+				navFleet: "Flota y Unidades",
+				navUsers: "Usuarios",
+				navAudit: "Auditoría",
+				logoutBtn: "← Cerrar Sesión",
+				searchPlaceholder: "Buscar por referencia o cliente...",
+				dashTitle: "Panel de Control Operativo",
+				statNew: "Nuevas Solicitudes",
+				statReview: "En Revisión",
+				statPayment: "Esperando Pago",
+				statConfirmed: "Confirmadas / Pagadas",
+				actionRequiredHeader: "Acción Requerida",
+				resTitle: "Bandeja de Reservas (Kanban)",
+				colNewHeader: "Nuevas / Pendientes",
+				colWaitingHeader: "Esperando Pago",
+				colConfirmedHeader: "Confirmadas",
+				fleetTitle: "Gestión de Flota",
+				usersTitle: "Gestión de Usuarios Operativos",
+				createUserBtn: "+ Nuevo Usuario",
+				auditTitle: "Registro de Auditoría",
+				modalReasonLabel: "Comentario / Motivo Interno",
+				modalCancelBtn: "Cancelar",
+				modalUserTitle: "Crear Nuevo Usuario Operativo",
+				lblUser: "Nombre de Usuario",
+				lblEmail: "Correo Electrónico",
+				lblPass: "Contraseña Inicial",
+				lblRole: "Rol de Acceso",
+				modalUserCancelBtn: "Cancelar",
+				modalUserSubmitBtn: "Crear Usuario",
+				btnApprove: "Aprobar",
+				btnConfirm: "Confirmar",
+				btnReject: "Rechazar",
+				noPending: "No hay acciones urgentes pendientes.",
+				noItems: "Sin elementos"
+			},
+			en: {
+				loginSub: "Fleet Rental Management Platform",
+				loginUserLabel: "Username or Email",
+				loginPassLabel: "Password",
+				loginBtn: "Sign In",
+				navDashboard: "Dashboard",
+				navReservations: "Reservations",
+				navFleet: "Fleet & Units",
+				navUsers: "Users",
+				navAudit: "Audit Log",
+				logoutBtn: "← Sign Out",
+				searchPlaceholder: "Search by reference or customer...",
+				dashTitle: "Operational Control Panel",
+				statNew: "New Requests",
+				statReview: "Under Review",
+				statPayment: "Awaiting Payment",
+				statConfirmed: "Confirmed / Paid",
+				actionRequiredHeader: "Action Required",
+				resTitle: "Reservation Board (Kanban)",
+				colNewHeader: "New / Pending",
+				colWaitingHeader: "Awaiting Payment",
+				colConfirmedHeader: "Confirmed",
+				fleetTitle: "Fleet Management",
+				usersTitle: "Operational Users Management",
+				createUserBtn: "+ New User",
+				auditTitle: "Audit Log",
+				modalReasonLabel: "Comment / Internal Reason",
+				modalCancelBtn: "Cancel",
+				modalUserTitle: "Create New Operational User",
+				lblUser: "Username",
+				lblEmail: "Email Address",
+				lblPass: "Initial Password",
+				lblRole: "Access Role",
+				modalUserCancelBtn: "Cancel",
+				modalUserSubmitBtn: "Create User",
+				btnApprove: "Approve",
+				btnConfirm: "Confirm",
+				btnReject: "Reject",
+				noPending: "No urgent actions pending.",
+				noItems: "No items"
+			}
+		};
+
+		document.addEventListener('DOMContentLoaded', () => {
+			applyTranslations();
+			if (authToken) {
+				checkAuth();
+			}
+		});
+
+		function setLang(lang) {
+			currentLang = lang;
+			localStorage.setItem('rrc_lang', lang);
+			applyTranslations();
+			if (authToken) {
+				loadDashboard();
+			}
+		}
+
+		function applyTranslations() {
+			const t = i18n[currentLang];
+			document.getElementById('t_loginSub').innerText = t.loginSub;
+			document.getElementById('t_loginUserLabel').innerText = t.loginUserLabel;
+			document.getElementById('t_loginPassLabel').innerText = t.loginPassLabel;
+			document.getElementById('t_loginBtn').innerText = t.loginBtn;
+			document.getElementById('t_navDashboard').innerText = t.navDashboard;
+			document.getElementById('t_navReservations').innerText = t.navReservations;
+			document.getElementById('t_navFleet').innerText = t.navFleet;
+			document.getElementById('t_navUsers').innerText = t.navUsers;
+			document.getElementById('t_navAudit').innerText = t.navAudit;
+			document.getElementById('t_logoutBtn').innerText = t.logoutBtn;
+			document.getElementById('t_searchPlaceholder').placeholder = t.searchPlaceholder;
+			document.getElementById('t_dashTitle').innerText = t.dashTitle;
+			document.getElementById('t_statNew').innerText = t.statNew;
+			document.getElementById('t_statReview').innerText = t.statReview;
+			document.getElementById('t_statPayment').innerText = t.statPayment;
+			document.getElementById('t_statConfirmed').innerText = t.statConfirmed;
+			document.getElementById('t_actionRequiredHeader').innerText = t.actionRequiredHeader;
+			document.getElementById('t_resTitle').innerText = t.resTitle;
+			document.getElementById('t_colNewHeader').innerText = t.colNewHeader;
+			document.getElementById('t_colWaitingHeader').innerText = t.colWaitingHeader;
+			document.getElementById('t_colConfirmedHeader').innerText = t.colConfirmedHeader;
+			document.getElementById('t_fleetTitle').innerText = t.fleetTitle;
+			document.getElementById('t_usersTitle').innerText = t.usersTitle;
+			document.getElementById('t_createUserBtn').innerText = t.createUserBtn;
+			document.getElementById('t_auditTitle').innerText = t.auditTitle;
+			document.getElementById('t_modalReasonLabel').innerText = t.modalReasonLabel;
+			document.getElementById('t_modalCancelBtn').innerText = t.modalCancelBtn;
+			document.getElementById('t_modalUserTitle').innerText = t.modalUserTitle;
+			document.getElementById('t_lblUser').innerText = t.lblUser;
+			document.getElementById('t_lblEmail').innerText = t.lblEmail;
+			document.getElementById('t_lblPass').innerText = t.lblPass;
+			document.getElementById('t_lblRole').innerText = t.lblRole;
+			document.getElementById('t_modalUserCancelBtn').innerText = t.modalUserCancelBtn;
+			document.getElementById('t_modalUserSubmitBtn').innerText = t.modalUserSubmitBtn;
+
+			document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+			if (currentLang === 'es') {
+				document.getElementById('btnLangEs')?.classList.add('active');
+			} else {
+				document.getElementById('btnLangEn')?.classList.add('active');
+			}
+		}
+
+		document.getElementById('loginForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const u = document.getElementById('loginUser').value;
+			const p = document.getElementById('loginPass').value;
+
+			try {
+				const res = await fetch(`${API_BASE}/auth/login`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username: u, password: p })
+				});
+				const data = await res.json();
+				if (data.success) {
+					authToken = data.token;
+					localStorage.setItem('rrc_token', authToken);
+					showApp(data.user);
+				} else {
+					alert(data.message || 'Login error.');
+				}
+			} catch (err) {
+				alert('API Connection error.');
+			}
+		});
+
+		async function checkAuth() {
+			try {
+				const res = await fetch(`${API_BASE}/auth/me`, {
+					headers: { 'Authorization': `Bearer ${authToken}` }
+				});
+				const data = await res.json();
+				if (data.success) {
+					showApp(data.user);
+				} else {
+					logout();
+				}
+			} catch (err) {
+				logout();
+			}
+		}
+
+		function showApp(user) {
+			document.getElementById('loginScreen').style.display = 'none';
+			document.getElementById('appWrapper').style.display = 'flex';
+			document.getElementById('userDisplayName').innerText = user.display_name;
+			if (document.getElementById('userDisplayNameCard')) {
+				document.getElementById('userDisplayNameCard').innerText = user.display_name;
+			}
+			loadDashboard();
+		}
+
+		function logout() {
+			localStorage.removeItem('rrc_token');
+			location.reload();
+		}
+
+		function showTab(tab) {
+			['tabDashboard', 'tabReservations', 'tabFleet', 'tabUsers', 'tabAudit'].forEach(t => document.getElementById(t).style.display = 'none');
+			document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+			if (tab === 'dashboard') { loadDashboard(); document.getElementById('tabDashboard').style.display = 'block'; }
+			if (tab === 'reservations') { loadReservations(); document.getElementById('tabReservations').style.display = 'block'; }
+			if (tab === 'fleet') { loadFleet(); document.getElementById('tabFleet').style.display = 'block'; }
+			if (tab === 'users') { loadUsers(); document.getElementById('tabUsers').style.display = 'block'; }
+			if (tab === 'audit') { loadAudit(); document.getElementById('tabAudit').style.display = 'block'; }
+		}
+
+		async function loadDashboard() {
+			const t = i18n[currentLang];
+			const res = await fetch(`${API_BASE}/dashboard`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+			const data = await res.json();
+			if (data.success) {
+				document.getElementById('statNew').innerText = data.stats.new_requests;
+				document.getElementById('statReview').innerText = data.stats.pending_approval;
+				document.getElementById('statPayment').innerText = data.stats.waiting_for_payment;
+				document.getElementById('statConfirmed').innerText = data.stats.confirmed_paid;
+
+				let html = '';
+				data.action_required.forEach(r => {
+					const dep = (parseFloat(r.deposit_amount) || (parseFloat(r.total_amount) * 0.10)).toFixed(2);
+					const rem = (parseFloat(r.remaining_balance) || (parseFloat(r.total_amount) * 0.90)).toFixed(2);
+					html += `
+						<div class="res-card" style="display:flex; gap:20px; align-items:center;">
+							${r.image_url ? `<img src="${r.image_url}" alt="${r.vehicle_name || 'Car'}" style="width:130px; height:85px; object-fit:contain; background:rgba(0,0,0,0.3); padding:4px; border-radius:12px; border:1px solid var(--border-color);">` : ''}
+							<div style="flex:1;">
+								<div class="res-ref">#${r.public_reference}</div>
+								<div class="res-cust">${r.first_name} ${r.last_name} (${r.email})</div>
+								<div class="res-details">Vehículo: <strong>${r.vehicle_name || 'N/A'}</strong> | Fechas: ${r.pickup_at} a ${r.return_at}</div>
+								<div class="res-price" style="display:flex; gap:16px; font-size:14px; margin-top:8px;">
+									<span style="color:var(--text-secondary);">Total: <strong style="color:#fff;">$${r.total_amount}</strong></span>
+									<span style="color:#4ade80;">Depósito (10%): <strong>$${dep}</strong></span>
+									<span style="color:#ef4444;">Saldo (90%): <strong>$${rem}</strong></span>
+								</div>
+							</div>
+							<div style="display:flex; flex-direction:column; gap:8px; min-width:140px;">
+								<button onclick="openActionModal(${r.id}, 'approve', '${t.btnApprove}')" class="btn-action btn-approve" style="margin:0;">${t.btnApprove}</button>
+								<button onclick="openActionModal(${r.id}, 'confirm', '${t.btnConfirm}')" class="btn-action" style="margin:0;">${t.btnConfirm}</button>
+								<button onclick="openActionModal(${r.id}, 'reject', '${t.btnReject}')" class="btn-action btn-reject" style="margin:0;">${t.btnReject}</button>
+							</div>
+						</div>
+					`;
+				});
+				document.getElementById('actionRequiredList').innerHTML = html || `<p style="color:var(--text-secondary);">${t.noPending}</p>`;
+			}
+		}
+
+		async function loadReservations() {
+			const t = i18n[currentLang];
+			const res = await fetch(`${API_BASE}/reservations`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+			const data = await res.json();
+			if (data.success) {
+				let colNew = '', colWaiting = '', colConfirmed = '';
+				data.reservations.forEach(r => {
+					const dep = (parseFloat(r.deposit_amount) || (parseFloat(r.total_amount) * 0.10)).toFixed(2);
+					const rem = (parseFloat(r.remaining_balance) || (parseFloat(r.total_amount) * 0.90)).toFixed(2);
+					const card = `
+						<div class="res-card">
+							${r.image_url ? `<img src="${r.image_url}" alt="${r.vehicle_name || 'Car'}" style="width:100%; height:110px; object-fit:contain; background:rgba(0,0,0,0.3); padding:6px; border-radius:10px; margin-bottom:12px; border:1px solid var(--border-color);">` : ''}
+							<div class="res-ref">#${r.public_reference}</div>
+							<div class="res-cust">${r.first_name} ${r.last_name}</div>
+							<div class="res-details">${r.vehicle_name || 'Vehículo'}</div>
+							<div class="res-price" style="font-size:14px; margin-top:8px;">
+								<div>Depósito 10%: <strong style="color:#4ade80;">$${dep} USD</strong></div>
+								<div style="font-size:12px; color:var(--text-secondary);">Saldo 90%: <strong style="color:#ef4444;">$${rem} USD</strong></div>
+							</div>
+						</div>
+					`;
+					if (r.reservation_status === 'draft' || r.reservation_status === 'requested' || r.reservation_status === 'hold') colNew += card;
+					else if (r.reservation_status === 'waiting_for_customer' || r.reservation_status === 'APPROVED') colWaiting += card;
+					else if (r.reservation_status === 'CONFIRMED' || r.reservation_status === 'confirmed') colConfirmed += card;
+				});
+				document.getElementById('colNew').innerHTML = colNew || `<p style="color:var(--text-secondary); font-size:13px;">${t.noItems}</p>`;
+				document.getElementById('colWaiting').innerHTML = colWaiting || `<p style="color:var(--text-secondary); font-size:13px;">${t.noItems}</p>`;
+				document.getElementById('colConfirmed').innerHTML = colConfirmed || `<p style="color:var(--text-secondary); font-size:13px;">${t.noItems}</p>`;
+			}
+		}
+
+		async function loadFleet() {
+			const res = await fetch(`${API_BASE}/fleet`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+			const data = await res.json();
+			if (data.success) {
+				let html = '<table style="width:100%; border-collapse:collapse; background:var(--bg-sidebar); border-radius:16px; overflow:hidden; border:1px solid var(--border-color);">';
+				html += '<tr style="background:#1e293b; text-align:left; font-size:12px; color:var(--text-secondary); text-transform:uppercase;"><th style="padding:14px;">Code</th><th>Model</th><th>Plate</th><th>Status</th></tr>';
+				data.units.forEach(u => {
+					html += `<tr style="border-bottom:1px solid var(--border-color); font-size:14px; color:#fff;"><td style="padding:14px;"><strong>${u.unit_code}</strong></td><td>${u.vehicle_name}</td><td>${u.license_plate}</td><td><span style="background:rgba(34,197,94,0.2); color:#4ade80; padding:4px 10px; border-radius:50px; font-size:12px; font-weight:700;">${u.status}</span></td></tr>`;
+				});
+				html += '</table>';
+				document.getElementById('fleetList').innerHTML = html;
+			}
+		}
+
+		async function loadUsers() {
+			const res = await fetch(`${API_BASE}/users`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+			const data = await res.json();
+			if (data.success) {
+				let html = '<table style="width:100%; border-collapse:collapse; background:var(--bg-sidebar); border-radius:16px; overflow:hidden; border:1px solid var(--border-color);">';
+				html += '<tr style="background:#1e293b; text-align:left; font-size:12px; color:var(--text-secondary); text-transform:uppercase;"><th style="padding:14px;">Usuario</th><th>Nombre</th><th>Email</th><th>Rol Asignado</th></tr>';
+				data.users.forEach(u => {
+					const roleName = u.roles ? u.roles.join(', ') : 'Asesor';
+					html += `<tr style="border-bottom:1px solid var(--border-color); font-size:14px; color:#fff;"><td style="padding:14px;"><strong>${u.username}</strong></td><td>${u.display_name}</td><td>${u.email}</td><td><span style="background:rgba(59,130,246,0.2); color:#60a5fa; padding:4px 10px; border-radius:50px; font-size:12px; font-weight:700;">${roleName}</span></td></tr>`;
+				});
+				html += '</table>';
+				document.getElementById('usersList').innerHTML = html;
+			}
+		}
+
+		async function loadAudit() {
+			const res = await fetch(`${API_BASE}/audit`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+			const data = await res.json();
+			if (data.success) {
+				let html = '<div style="background:var(--bg-sidebar); padding:24px; border-radius:16px; border:1px solid var(--border-color);">';
+				data.audit_logs.forEach(a => {
+					html += `<div style="padding:12px 0; border-bottom:1px solid var(--border-color); font-size:13px; color:var(--text-secondary);"><strong style="color:#fff;">${a.user_name || 'System'}</strong> executed <code style="color:var(--brand-blue);">${a.action}</code> on ${a.entity_type} #${a.entity_id} <span style="float:right;">${a.created_at}</span></div>`;
+				});
+				html += '</div>';
+				document.getElementById('auditLogList').innerHTML = html;
+			}
+		}
+
+		function openActionModal(id, action, title) {
+			activeResId = id;
+			currentAction = action;
+			document.getElementById('modalTitle').innerText = title;
+			document.getElementById('modalReason').value = '';
+			document.getElementById('decisionModal').style.display = 'flex';
+		}
+
+		function closeModal() {
+			document.getElementById('decisionModal').style.display = 'none';
+		}
+
+		function openCreateUserModal() {
+			document.getElementById('createUserModal').style.display = 'flex';
+		}
+
+		function closeUserModal() {
+			document.getElementById('createUserModal').style.display = 'none';
+		}
+
+		document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const u = document.getElementById('newUsername').value;
+			const em = document.getElementById('newEmail').value;
+			const p = document.getElementById('newPassword').value;
+			const r = document.getElementById('newRole').value;
+
+			const res = await fetch(`${API_BASE}/users`, {
+				method: 'POST',
+				headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: u, email: em, password: p, role: r })
+			});
+			const data = await res.json();
+			if (data.success) {
+				closeUserModal();
+				loadUsers();
+				alert(data.message);
+			} else {
+				alert(data.message || 'Error al crear usuario.');
+			}
+		});
+
+		document.getElementById('modalConfirmBtn').addEventListener('click', async () => {
+			const reason = document.getElementById('modalReason').value;
+			const res = await fetch(`${API_BASE}/reservations/${activeResId}/${currentAction}`, {
+				method: 'POST',
+				headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+				body: JSON.stringify({ reason: reason })
+			});
+			const data = await res.json();
+			if (data.success) {
+				closeModal();
+				loadDashboard();
+			} else {
+				alert(data.message || 'Action error.');
+			}
+		});
+	</script>
+</body>
+</html>
+
+</body>
+</html>
