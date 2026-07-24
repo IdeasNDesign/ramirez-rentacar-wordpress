@@ -149,9 +149,13 @@ class CaptureOrderController {
 		// Audit Log
 		$audit_logger->log( 'PAYPAL_DEPOSIT_COMPLETED', 'reservation', $res->id, [ 'old_status' => $res->reservation_status ], [ 'new_status' => 'CONFIRMED' ] );
 
-		// Email confirmation
-		if ( class_exists( '\\RamirezRentACar\\Infrastructure\Notifications\\EmailNotificationService' ) ) {
+		// Email confirmation to Customer
+		if ( class_exists( 'RamirezRentACar\\Infrastructure\\Notifications\\EmailNotificationService' ) ) {
 			\RamirezRentACar\Infrastructure\Notifications\EmailNotificationService::send_reservation_confirmation( $res->id );
 		}
+
+		// Email notification to Staff/Admin
+		$staff_notification = new \BreakTheMold\RamirezPayPal\Notifications\StaffReservationConfirmed( $this->container );
+		$staff_notification->send( $res->id, $order_id, $capture_id );
 	}
 }
