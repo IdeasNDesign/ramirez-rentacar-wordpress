@@ -125,8 +125,38 @@ class Routes {
 		return current_user_can( \BreakTheMold\RamirezPayPal\Core\Capabilities::REFUND_PAYMENT );
 	}
 
-	public function check_agent_permission() {
-		return is_user_logged_in();
+	public function check_agent_permission( $request ) {
+		$auth_header = $request->get_header( 'Authorization' );
+		$token = '';
+
+		if ( $auth_header && preg_match( '/Bearer\s+(.*)$/i', $auth_header, $matches ) ) {
+			$token = trim( $matches[1] );
+		} elseif ( isset( $_COOKIE['rrc_op_token'] ) ) {
+			$token = sanitize_text_field( $_COOKIE['rrc_op_token'] );
+		}
+
+		if ( empty( $token ) ) {
+			return false;
+		}
+
+		global $wpdb;
+		$token_hash = hash( 'sha256', $token );
+		$sessions_table = $wpdb->prefix . 'rrc_app_sessions';
+
+		$session = $wpdb->get_row( $wpdb->prepare(
+			"SELECT * FROM $sessions_table WHERE token_hash = %s AND expires_at > %s",
+			$token_hash, current_time( 'mysql' )
+		) );
+
+		if ( ! $session ) {
+			return false;
+		}
+
+		// Update activity and set current user context
+		$wpdb->update( $sessions_table, [ 'last_activity_at' => current_time( 'mysql' ) ], [ 'id' => $session->id ] );
+		wp_set_current_user( $session->user_id );
+
+		return true;
 	}
 
 	public function deliver_reservation( $request ) {
