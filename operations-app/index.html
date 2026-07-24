@@ -286,7 +286,9 @@
 	</div>
 
 	<script>
-		const API_BASE = '/ramirezrentacar/wp-json/ramirez-rent-a-car/v1/app';
+		const API_BASE = window.location.pathname.includes('/ramirezrentacar/') 
+			? '/ramirezrentacar/wp-json/ramirez-rent-a-car/v1/app' 
+			: '/wp-json/ramirez-rent-a-car/v1/app';
 		let authToken = localStorage.getItem('rrc_token') || '';
 		let currentLang = localStorage.getItem('rrc_lang') || 'es';
 		let activeResId = null;
