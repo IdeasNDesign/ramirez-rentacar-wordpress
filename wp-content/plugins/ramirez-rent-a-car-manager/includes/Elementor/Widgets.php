@@ -3782,7 +3782,6 @@ class Widgets {
 						<ul class="rrc-terms-card-list">
 							<li>Para preguntas, solicitudes o reclamos, puede contactarnos:
 								<ul style="list-style:none; padding-left:0; margin-top:5px; color:#64748b; display:flex; flex-direction:column; gap:5px;">
-									<li>📞 (+504) 24-45-01-58</li>
 									<li>📞 (+504) 99-03-96-16</li>
 									<li>✉️ info@RamirezRentACar.com</li>
 								</ul>
@@ -4194,7 +4193,7 @@ class Widgets {
 								<li><strong>Correo electrónico:</strong> info@RamirezRentACar.com</li>
 								<li><strong>Sitio web:</strong> www.RamirezRentACar.com</li>
 								<li><strong>Oficinas:</strong> Roatán (Coxen Hole, Islas de la Bahía) y San Pedro Sula</li>
-								<li><strong>Teléfonos:</strong> (+504) 24-45-01-58 | (+504) 99-03-96-16</li>
+								<li><strong>Teléfonos:</strong> (+504) 99-03-96-16</li>
 							</ul>
 						</div>
 					</div>
@@ -4435,7 +4434,7 @@ class Widgets {
 						<div class="rrc-privacy-card-content">
 							<ul class="rrc-privacy-card-list">
 								<li><strong>Correo:</strong> info@RamirezRentACar.com</li>
-								<li><strong>Teléfonos:</strong> (+504) 24-45-01-58 | (+504) 99-03-96-16</li>
+								<li><strong>Teléfonos:</strong> (+504) 99-03-96-16</li>
 								<li><strong>Oficinas:</strong>
 									<ul style="list-style:circle; padding-left:12px; margin-top:5px;">
 										<li><strong>Roatán:</strong> Coxen Hole, Calle Principal al Aeropuerto, Roatán, Islas de la Bahía, Honduras</li>
