@@ -559,7 +559,13 @@
 							${r.image_url ? `<img src="${r.image_url}" alt="${r.vehicle_name || 'Car'}" style="width:100%; height:110px; object-fit:contain; background:rgba(0,0,0,0.3); padding:6px; border-radius:10px; margin-bottom:12px; border:1px solid var(--border-color);">` : ''}
 							<div class="res-ref">#${r.public_reference}</div>
 							<div class="res-cust">${r.first_name} ${r.last_name}</div>
-							<div class="res-details">${r.vehicle_name || 'Vehículo'}</div>
+							<div class="res-details">
+								<div><strong>${r.vehicle_name || 'Vehículo'}</strong></div>
+								<div style="font-size:11.5px; color:var(--text-secondary); margin-top:8px; line-height:1.4; background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+									🕒 <strong>Entrega:</strong> ${r.pickup_at}<br>
+									🕒 <strong>Devolución:</strong> ${r.return_at}
+								</div>
+							</div>
 							<div class="res-price" style="font-size:14px; margin-top:8px;">
 								<div>Depósito 10%: <strong style="color:#4ade80;">$${dep} USD</strong></div>
 								<div style="font-size:12px; color:var(--text-secondary);">Saldo 90%: <strong style="color:#ef4444;">$${rem} USD</strong></div>
