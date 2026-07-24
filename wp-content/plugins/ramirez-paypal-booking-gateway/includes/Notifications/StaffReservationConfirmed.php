@@ -41,7 +41,7 @@ class StaffReservationConfirmed {
 			return false;
 		}
 
-		$admin_email = get_option( 'admin_email' );
+		$admin_email = 'info@ramirezrentacar.com';
 		$subject = sprintf( '🔔 Nueva reserva confirmada – %s', $res->public_reference );
 
 		$headers = [
