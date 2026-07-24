@@ -46,6 +46,7 @@ class Plugin {
 
 		// Register hooks
 		add_action( 'rest_api_init', [ $this->container->get( 'rest_routes' ), 'register' ] );
+		add_action( 'rrc_send_return_day_reminder', [ $this, 'send_return_day_reminder' ], 10, 1 );
 		
 		if ( is_admin() ) {
 			add_action( 'admin_menu', [ $this->container->get( 'admin_menu' ), 'register' ], 15 );
@@ -94,5 +95,11 @@ class Plugin {
 
 	public function get_container() {
 		return $this->container;
+	}
+
+	public function send_return_day_reminder( $reservation_id ) {
+		if ( class_exists( '\\BreakTheMold\\RamirezPayPal\\Notifications\\CustomerReturnDayReminder' ) ) {
+			\BreakTheMold\RamirezPayPal\Notifications\CustomerReturnDayReminder::send( $reservation_id );
+		}
 	}
 }

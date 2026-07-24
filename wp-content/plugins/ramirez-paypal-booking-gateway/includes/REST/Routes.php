@@ -169,6 +169,16 @@ class Routes {
 		if ( class_exists( '\\BreakTheMold\\RamirezPayPal\\Notifications\\CustomerVehicleDelivered' ) ) {
 			\BreakTheMold\RamirezPayPal\Notifications\CustomerVehicleDelivered::send( $id );
 		}
+
+		// Schedule friendly email reminder for 6:00 AM on the day of return (Honduras local time)
+		$return_date = date( 'Y-m-d', strtotime( $res->return_at ) );
+		$reminder_time = strtotime( $return_date . ' 06:00:00' );
+
+		// If 6:00 AM on the return day is in the future, schedule the event
+		if ( $reminder_time > current_time( 'timestamp' ) ) {
+			wp_clear_scheduled_hook( 'rrc_send_return_day_reminder', [ $id ] );
+			wp_schedule_single_event( $reminder_time, 'rrc_send_return_day_reminder', [ $id ] );
+		}
 		
 		return rest_ensure_response( [ 'success' => true, 'message' => 'Vehículo marcado como entregado.' ] );
 	}
