@@ -1187,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					paypalContainer.innerHTML = '';
 					window.paypal.Buttons({
 						createOrder: function(data, actions) {
-							return fetch(`<?php echo esc_url( get_rest_url( null, "ramirez-rent-a-car/v1/reservations/" ) ); ?>${currentReservationToken}/paypal/order`, {
+							return fetch(`<?php echo esc_url( get_rest_url( null, "ramirez-paypal/v1/reservations/" ) ); ?>${currentReservationToken}/order`, {
 								method: 'POST',
 								headers: { 'Content-Type': 'application/json' }
 							})
@@ -1202,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						},
 						onApprove: function(data, actions) {
 							paypalContainer.innerHTML = '<p style="text-align:center; font-size:13px; color:#10b981; font-weight:700;">Verificando depósito con el servidor...</p>';
-							return fetch(`<?php echo esc_url( get_rest_url( null, "ramirez-rent-a-car/v1/reservations/" ) ); ?>${currentReservationToken}/paypal/capture`, {
+							return fetch(`<?php echo esc_url( get_rest_url( null, "ramirez-paypal/v1/reservations/" ) ); ?>${currentReservationToken}/capture`, {
 								method: 'POST',
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify({ order_id: data.orderID })
