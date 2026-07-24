@@ -1,0 +1,20 @@
+{
+    "name": "breakthemold/ramirez-paypal-booking-gateway",
+    "description": "PayPal Booking Gateway for Ramirez Rent A Car",
+    "type": "wordpress-plugin",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Break The Mold"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "BreakTheMold\\RamirezPayPal\\": "includes/"
+        }
+    }
+}

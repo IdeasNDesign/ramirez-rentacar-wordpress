@@ -1,0 +1,116 @@
+/**
+ * BTM Language Switcher — Styles
+ *
+ * @package BreakTheMold\AITranslator
+ * @author  Break The Mold
+ */
+
+/* ── Switcher Container ─────────────────────────────── */
+.btm-lang-switcher {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px;
+	background: #f1f5f9;
+	border-radius: 10px;
+	font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
+}
+
+/* ── Buttons Layout ─────────────────────────────────── */
+.btm-lang-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	border: none;
+	border-radius: 8px;
+	background: transparent;
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: all 0.25s ease;
+	line-height: 1;
+	white-space: nowrap;
+	user-select: none;
+}
+
+.btm-lang-btn:hover {
+	background: #e2e8f0;
+	color: #0f172a;
+}
+
+.btm-lang-btn.active {
+	background: #E8272C;
+	color: #ffffff;
+	box-shadow: 0 2px 8px rgba(232, 39, 44, 0.25);
+}
+
+.btm-lang-btn.active:hover {
+	background: #c61d22;
+}
+
+.btm-lang-flag {
+	font-size: 16px;
+	line-height: 1;
+}
+
+.btm-lang-label {
+	letter-spacing: 0.3px;
+}
+
+/* ── Dropdown Layout ────────────────────────────────── */
+.btm-lang-select {
+	padding: 8px 32px 8px 12px;
+	border: 1.5px solid #e2e8f0;
+	border-radius: 8px;
+	background: #ffffff;
+	font-size: 13px;
+	font-weight: 700;
+	color: #0f172a;
+	cursor: pointer;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	transition: border-color 0.2s ease;
+}
+
+.btm-lang-select:hover {
+	border-color: #cbd5e1;
+}
+
+.btm-lang-select:focus {
+	outline: none;
+	border-color: #E8272C;
+	box-shadow: 0 0 0 3px rgba(232, 39, 44, 0.12);
+}
+
+/* ── Compact Layout ─────────────────────────────────── */
+.btm-layout-compact .btm-lang-btn {
+	padding: 6px 10px;
+	font-size: 11px;
+}
+
+.btm-layout-compact {
+	border-radius: 6px;
+	gap: 2px;
+	padding: 2px;
+}
+
+/* ── Flags-only Layout ──────────────────────────────── */
+.btm-layout-flags .btm-lang-btn {
+	padding: 6px 10px;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 480px) {
+	.btm-lang-btn {
+		padding: 6px 12px;
+		font-size: 12px;
+	}
+
+	.btm-lang-flag {
+		font-size: 14px;
+	}
+}

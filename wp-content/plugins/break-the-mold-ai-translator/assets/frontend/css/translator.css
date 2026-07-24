@@ -1,0 +1,26 @@
+/**
+ * BTM Translator — Styles
+ *
+ * @package BreakTheMold\AITranslator
+ * @author  Break The Mold
+ */
+
+/* Early loading state to prevent flash of untranslated content (FOUC) */
+.btm-language-loading {
+	opacity: 0;
+	transition: opacity 0.2s ease-in-out;
+}
+
+/* Tight text adjustments when elements might overflow */
+.btm-fit-tight {
+	letter-spacing: -0.02em !important;
+	word-spacing: -0.05em !important;
+}
+
+/* Extra tight */
+.btm-fit-very-tight {
+	letter-spacing: -0.04em !important;
+	word-spacing: -0.08em !important;
+	transform: scaleX(0.95);
+	transform-origin: left center;
+}

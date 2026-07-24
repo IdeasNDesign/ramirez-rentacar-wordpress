@@ -1,0 +1,13 @@
+/* Ramirez PayPal Booking Gateway - Frontend Checkout Styles */
+.rrc-paypal-checkout-container {
+    padding: 20px;
+    background: rgba(18, 24, 38, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-top: 15px;
+}
+.rrc-paypal-checkout-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}

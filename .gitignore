@@ -1,0 +1,25 @@
+# Ignore everything by default in the root
+/*
+
+# Allow tracking this .gitignore and README
+!/.gitignore
+!/README.md
+!/docs/
+
+# Allow tracking custom code inside wp-content
+!/wp-content/
+
+# Ignore everything inside wp-content except plugins and themes
+/wp-content/*
+!/wp-content/plugins/
+!/wp-content/themes/
+
+# Ignore everything inside plugins except our specific custom plugins
+/wp-content/plugins/*
+!/wp-content/plugins/ramirez-rent-a-car-manager/
+!/wp-content/plugins/ramirez-paypal-booking-gateway/
+!/wp-content/plugins/ramirez-rent-a-car-ai-assistant/
+!/wp-content/plugins/break-the-mold-ai-translator/
+
+# Ignore everything inside themes except child themes if applicable
+/wp-content/themes/*
