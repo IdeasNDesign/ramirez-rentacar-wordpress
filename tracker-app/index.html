@@ -85,10 +85,6 @@
 				<label>Código de Reserva</label>
 				<input type="text" id="resCode" required placeholder="ej: RRC-GAPHNBBE" autocomplete="off">
 			</div>
-			<div class="form-group">
-				<label>Correo Electrónico</label>
-				<input type="email" id="resEmail" required placeholder="ej: tuemail@correo.com" autocomplete="off">
-			</div>
 			<button type="submit" class="btn-track">Buscar Reserva</button>
 		</form>
 
@@ -168,7 +164,6 @@
 		document.getElementById('trackForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const code = document.getElementById('resCode').value.trim();
-			const email = document.getElementById('resEmail').value.trim();
 			const errorBox = document.getElementById('errorBox');
 			const detailsCard = document.getElementById('resDetails');
 
@@ -178,7 +173,7 @@
 				const response = await fetch(`${API_BASE}/tracker`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ reference: code, email: email })
+					body: JSON.stringify({ reference: code })
 				});
 
 				const data = await response.json();

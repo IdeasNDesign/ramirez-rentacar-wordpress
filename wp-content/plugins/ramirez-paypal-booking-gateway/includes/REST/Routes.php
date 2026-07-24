@@ -155,13 +155,12 @@ class Routes {
 
 	public function track_reservation( $request ) {
 		$reference = sanitize_text_field( $request->get_param( 'reference' ) );
-		$email     = sanitize_email( $request->get_param( 'email' ) );
 
 		// Strip '#' from reference if present
 		$reference = ltrim( $reference, '#' );
 
-		if ( empty( $reference ) || empty( $email ) ) {
-			return new \WP_REST_Response( [ 'success' => false, 'message' => 'El código de reserva y el correo son obligatorios.' ], 400 );
+		if ( empty( $reference ) ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'El código de reserva es obligatorio.' ], 400 );
 		}
 
 		global $wpdb;
@@ -172,7 +171,7 @@ class Routes {
 
 		$res = $wpdb->get_row( $wpdb->prepare(
 			"SELECT r.*, 
-			        c.first_name, c.last_name, c.email,
+			        c.first_name, c.last_name,
 			        m.public_name AS vehicle_name, m.post_id,
 			        pl.name AS pickup_location_name,
 			        rl.name AS return_location_name
@@ -187,11 +186,6 @@ class Routes {
 
 		if ( ! $res ) {
 			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Reserva no encontrada.' ], 404 );
-		}
-
-		// Verify email
-		if ( strtolower( trim( $res->email ) ) !== strtolower( trim( $email ) ) ) {
-			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Los datos ingresados no coinciden con nuestros registros.' ], 403 );
 		}
 
 		// Resolve vehicle image
