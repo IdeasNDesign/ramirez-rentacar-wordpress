@@ -79,6 +79,7 @@ class CaptureOrderController {
 			return new WP_REST_Response( [
 				'success'            => true,
 				'message'            => 'Pago completado con éxito.',
+				'reference'          => $updated_res->public_reference,
 				'reservation_status' => $updated_res->reservation_status,
 				'deposit_paid'       => number_format( (float) $updated_res->deposit_paid_amount, 2, '.', '' ),
 				'remaining_balance'  => number_format( (float) $updated_res->remaining_balance, 2, '.', '' )

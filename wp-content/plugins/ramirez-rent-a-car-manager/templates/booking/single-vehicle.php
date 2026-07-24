@@ -1211,17 +1211,58 @@ document.addEventListener('DOMContentLoaded', function() {
 							.then(captureData => {
 								if (captureData.success) {
 									driverDrawer.classList.remove('open');
-									successMsgBox.style.display = 'block';
-									successMsgBox.innerHTML = `
-										<div style="font-weight: 900; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; color:#065f46;">
-											🎉 ¡Depósito Recibido y Reserva Confirmada!
+									
+									// Create a premium success modal overlay
+									const modalOverlay = document.createElement('div');
+									modalOverlay.style.position = 'fixed';
+									modalOverlay.style.top = '0';
+									modalOverlay.style.left = '0';
+									modalOverlay.style.width = '100%';
+									modalOverlay.style.height = '100%';
+									modalOverlay.style.backgroundColor = 'rgba(11, 15, 25, 0.95)';
+									modalOverlay.style.backdropFilter = 'blur(10px)';
+									modalOverlay.style.zIndex = '99999';
+									modalOverlay.style.display = 'flex';
+									modalOverlay.style.alignItems = 'center';
+									modalOverlay.style.justifyContent = 'center';
+									modalOverlay.style.padding = '20px';
+
+									modalOverlay.innerHTML = `
+										<div style="background: #ffffff; color: #1e293b; border-radius: 24px; padding: 40px; width: 100%; max-width: 520px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; font-family: system-ui, -apple-system, sans-serif; position: relative; border-top: 5px solid #E8272C;">
+											<div style="font-size: 55px; margin-bottom: 20px;">🎉</div>
+											<h2 style="margin-top: 0; margin-bottom: 12px; color: #E8272C; font-size: 24px; font-weight: 800; line-height: 1.3;">¡Depósito Recibido y Reserva Confirmada!</h2>
+											
+											<p style="font-size: 15px; color: #64748b; margin-bottom: 24px; line-height: 1.5;">
+												Tu reserva ha sido asegurada con la referencia <strong style="color: #0f172a; font-size: 16px;">#${captureData.reference || 'Confirmada'}</strong>.
+											</p>
+
+											<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 28px; text-align: left;">
+												<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #edf2f7; font-size: 14px;">
+													<span style="color: #64748b; font-weight: 500;">Depósito pagado (10%):</span>
+													<strong style="color: #16a34a;">$${captureData.deposit_paid} USD</strong>
+												</div>
+												<div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px;">
+													<span style="color: #64748b; font-weight: 500;">Saldo pendiente (90%):</span>
+													<strong style="color: #dc2626;">$${captureData.remaining_balance} USD</strong>
+												</div>
+											</div>
+
+											<p style="font-size: 14.5px; color: #475569; margin-bottom: 30px; line-height: 1.5;">
+												Hemos enviado el comprobante oficial con todos los detalles de tu confirmación al correo electrónico: <strong style="color: #0f172a;">${email || 'proporcionado'}</strong>.
+											</p>
+
+											<button id="closeSuccessModalBtn" style="background: #E8272C; color: #ffffff; border: none; padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 20px rgba(232,39,44,0.3); width: 100%;">
+												Entendido
+											</button>
 										</div>
-										Tu reserva ha sido asegurada con la referencia <strong>#${data.public_reference || 'Confirmada'}</strong>.<br>
-										Depósito pagado (10%): <strong>$${captureData.deposit_paid} USD</strong><br>
-										Saldo pendiente a pagar al retirar: <strong>$${captureData.remaining_balance} USD</strong><br><br>
-										Hemos enviado el comprobante oficial a tu correo electrónico.
 									`;
-									successMsgBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+									document.body.appendChild(modalOverlay);
+
+									// Add click handler to close the modal
+									document.getElementById('closeSuccessModalBtn').addEventListener('click', () => {
+										modalOverlay.remove();
+										window.location.reload();
+									});
 								} else {
 									alert('Error al verificar la captura: ' + captureData.message);
 								}
