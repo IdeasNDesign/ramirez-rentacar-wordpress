@@ -37,6 +37,12 @@ class Routes {
 			'permission_callback' => '__return_true'
 		] );
 
+		register_rest_route( $namespace, '/tracker', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'track_reservation' ],
+			'permission_callback' => '__return_true'
+		] );
+
 		// Webhook Endpoint (Public, verified internally)
 		register_rest_route( $namespace, '/webhook', [
 			'methods'             => WP_REST_Server::CREATABLE,
@@ -145,5 +151,78 @@ class Routes {
 		] );
 		
 		return rest_ensure_response( [ 'success' => true, 'message' => 'Vehículo marcado como entregado.' ] );
+	}
+
+	public function track_reservation( $request ) {
+		$reference = sanitize_text_field( $request->get_param( 'reference' ) );
+		$email     = sanitize_email( $request->get_param( 'email' ) );
+
+		// Strip '#' from reference if present
+		$reference = ltrim( $reference, '#' );
+
+		if ( empty( $reference ) || empty( $email ) ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'El código de reserva y el correo son obligatorios.' ], 400 );
+		}
+
+		global $wpdb;
+		$res_table   = $wpdb->prefix . 'rrc_reservations';
+		$cust_table  = $wpdb->prefix . 'rrc_customers';
+		$model_table = $wpdb->prefix . 'rrc_vehicle_models';
+		$loc_table   = $wpdb->prefix . 'rrc_locations';
+
+		$res = $wpdb->get_row( $wpdb->prepare(
+			"SELECT r.*, 
+			        c.first_name, c.last_name, c.email,
+			        m.public_name AS vehicle_name, m.post_id,
+			        pl.name AS pickup_location_name,
+			        rl.name AS return_location_name
+			 FROM $res_table r
+			 JOIN $cust_table c ON r.customer_id = c.id
+			 LEFT JOIN $model_table m ON r.vehicle_model_id = m.id
+			 LEFT JOIN $loc_table pl ON r.pickup_location_id = pl.id
+			 LEFT JOIN $loc_table rl ON r.return_location_id = rl.id
+			 WHERE r.public_reference = %s",
+			$reference
+		) );
+
+		if ( ! $res ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Reserva no encontrada.' ], 404 );
+		}
+
+		// Verify email
+		if ( strtolower( trim( $res->email ) ) !== strtolower( trim( $email ) ) ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Los datos ingresados no coinciden con nuestros registros.' ], 403 );
+		}
+
+		// Resolve vehicle image
+		$vehicle_img = '';
+		if ( ! empty( $res->post_id ) ) {
+			$vehicle_img = get_post_meta( $res->post_id, '_rrc_image_url', true );
+		}
+
+		$dep = (float) ($res->deposit_paid_amount > 0 ? $res->deposit_paid_amount : $res->deposit_amount);
+		$rem = (float) $res->remaining_balance;
+
+		return rest_ensure_response( [
+			'success' => true,
+			'reservation' => [
+				'reference'          => $res->public_reference,
+				'status'             => $res->reservation_status,
+				'payment_status'     => $res->payment_status,
+				'customer_name'      => $res->first_name . ' ' . $res->last_name,
+				'vehicle_name'       => $res->vehicle_name,
+				'vehicle_image'      => $vehicle_img,
+				'pickup_location'    => $res->pickup_location_name,
+				'return_location'    => $res->return_location_name,
+				'pickup_at'          => $res->pickup_at,
+				'return_at'          => $res->return_at,
+				'total_amount'       => (float) $res->total_amount,
+				'deposit_paid'       => $dep,
+				'remaining_balance'  => $rem,
+				'checked_out_at'     => $res->checked_out_at,
+				'returned_at'        => $res->returned_at,
+				'created_at'         => $res->created_at
+			]
+		] );
 	}
 }
