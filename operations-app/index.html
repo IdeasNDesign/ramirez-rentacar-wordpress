@@ -285,6 +285,23 @@
 		</div>
 	</div>
 
+	<!-- SEND MESSAGE TO CUSTOMER MODAL -->
+	<div id="messageModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:9999;">
+		<div class="modal-content" style="max-width:500px; width:100%;">
+			<h3 class="modal-title" style="margin-bottom:8px;">Enviar Mensaje al Cliente</h3>
+			<p style="color:var(--text-secondary); font-size:12.5px; margin-bottom:20px; line-height:1.4;">Escribe un mensaje personalizado. Se enviará por correo electrónico con el diseño y logo oficial de Ramirez Rent A Car.</p>
+			
+			<div class="form-group">
+				<textarea id="modalMsgText" style="width:100%; height:150px; background:#1e293b; border:1px solid var(--border-color); border-radius:var(--radius-md); color:#fff; padding:16px; font-size:14px; outline:none; resize:none;" placeholder="ej: Hola Ivan, te informamos que ya tenemos tu vehículo listo en la sucursal..."></textarea>
+			</div>
+			
+			<div style="display:flex; gap:12px; margin-top:24px;">
+				<button type="button" onclick="closeMessageModal()" style="flex:1; padding:14px; border:none; border-radius:var(--radius-md); background:#334155; color:#fff; font-weight:800; cursor:pointer;">Cancelar</button>
+				<button type="button" onclick="sendCustomerMessage()" class="btn-action" style="flex:1; margin-top:0; padding:14px;">Enviar Mensaje</button>
+			</div>
+		</div>
+	</div>
+
 	<script>
 		const API_BASE = window.location.pathname.includes('/ramirezrentacar/') 
 			? '/ramirezrentacar/wp-json/ramirez-rent-a-car/v1/app' 
@@ -581,6 +598,7 @@
 								<div>Depósito 10%: <strong style="color:#4ade80;">$${dep} USD</strong></div>
 								<div style="font-size:12px; color:var(--text-secondary);">Saldo 90%: <strong style="color:#ef4444;">$${rem} USD</strong></div>
 							</div>
+							<button onclick="openMessageModal(${r.id})" class="btn-action" style="padding:8px 12px; margin-top:8px; font-size:12px; background:transparent; border:1px solid var(--border-color); color:var(--text-secondary); box-shadow:none; cursor:pointer; width:100%; display:block; text-align:center; margin-bottom:8px;">✉️ Enviar Mensaje</button>
 							${deliverBadge}
 						</div>
 					`;
@@ -716,6 +734,46 @@
 				alert(data.message || 'Action error.');
 			}
 		});
+
+		let currentMsgResId = null;
+
+		function openMessageModal(id) {
+			currentMsgResId = id;
+			document.getElementById('modalMsgText').value = '';
+			document.getElementById('messageModal').style.display = 'flex';
+		}
+
+		function closeMessageModal() {
+			document.getElementById('messageModal').style.display = 'none';
+		}
+
+		async function sendCustomerMessage() {
+			const text = document.getElementById('modalMsgText').value.trim();
+			if (!text) {
+				alert('Por favor escribe un mensaje.');
+				return;
+			}
+
+			const base = window.location.pathname.includes('/ramirezrentacar/') 
+				? '/ramirezrentacar/wp-json/ramirez-paypal/v1' 
+				: '/wp-json/ramirez-paypal/v1';
+
+			const res = await fetch(`${base}/admin/reservations/${currentMsgResId}/send-message`, {
+				method: 'POST',
+				headers: { 
+					'Authorization': `Bearer ${authToken}`,
+					'Content-Type': 'application/json' 
+				},
+				body: JSON.stringify({ message: text })
+			});
+			const data = await res.json();
+			if (data.success) {
+				alert('¡Mensaje enviado con éxito al cliente!');
+				closeMessageModal();
+			} else {
+				alert(data.message || 'Error al enviar el mensaje.');
+			}
+		}
 	</script>
 </body>
 </html>

@@ -74,6 +74,12 @@ class Routes {
 			'callback'            => [ $this, 'deliver_reservation' ],
 			'permission_callback' => [ $this, 'check_agent_permission' ]
 		] );
+
+		register_rest_route( $namespace, '/admin/reservations/(?P<id>\d+)/send-message', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'send_customer_message' ],
+			'permission_callback' => [ $this, 'check_agent_permission' ]
+		] );
 	}
 
 	public function create_order( $request ) {
@@ -248,5 +254,98 @@ class Routes {
 				'created_at'         => $res->created_at
 			]
 		] );
+	}
+
+	public function send_customer_message( $request ) {
+		$id      = intval( $request->get_param( 'id' ) );
+		$message = sanitize_textarea_field( $request->get_param( 'message' ) );
+
+		if ( empty( $message ) ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'El mensaje no puede estar vacío.' ], 400 );
+		}
+
+		global $wpdb;
+		$res_table  = $wpdb->prefix . 'rrc_reservations';
+		$cust_table = $wpdb->prefix . 'rrc_customers';
+
+		$res = $wpdb->get_row( $wpdb->prepare(
+			"SELECT r.*, c.first_name, c.last_name, c.email AS cust_email
+			 FROM $res_table r
+			 JOIN $cust_table c ON r.customer_id = c.id
+			 WHERE r.id = %d",
+			$id
+		) );
+
+		if ( ! $res || empty( $res->cust_email ) ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Reserva o correo de cliente no encontrado.' ], 404 );
+		}
+
+		$to = $res->cust_email;
+		$subject = '🚗 Mensaje sobre tu Reserva - Ramirez Rent a Car';
+		$headers = [
+			'Content-Type: text/html; charset=UTF-8',
+			'From: Ramirez Rent a Car <' . get_option( 'admin_email' ) . '>',
+		];
+
+		// Build beautiful branded email template
+		$logo_url = 'https://ramirezrentacar.com/wp-content/uploads/2026/R-Rent-a-car-logo-app.png';
+		$formatted_message = nl2br( esc_html( $message ) );
+
+		ob_start();
+		?>
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<meta charset="UTF-8">
+			<title>Mensaje de Ramirez Rent a Car</title>
+		</head>
+		<body style="font-family: sans-serif; color: #334155; line-height: 1.6; background-color: #f8fafc; padding: 20px;">
+			<div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+				
+				<!-- LOGO HEADER -->
+				<div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px;">
+					<img src="<?php echo esc_url( $logo_url ); ?>" alt="Ramirez Rent a Car" style="max-height: 55px; display: inline-block;">
+				</div>
+
+				<h3 style="color: #E8272C; margin-top: 0; font-size: 18px;">Estimado(a) <?php echo esc_html( $res->first_name ); ?>,</h3>
+				
+				<div style="font-size: 15px; color: #334155; margin-bottom: 25px; background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #f1f5f9; line-height: 1.7;">
+					<?php echo $formatted_message; ?>
+				</div>
+
+				<p style="font-size: 13px; color: #94a3b8; text-align: center;">
+					Detalle de referencia de reserva: <strong>#<?php echo esc_html( $res->public_reference ); ?></strong>
+				</p>
+
+				<div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 12px; color: #94a3b8; margin-top: 25px;">
+					<p>Atentamente,</p>
+					<p style="font-weight: bold; margin-top: 5px; color: #0f172a;">Equipo Ramirez Rent a Car</p>
+					<p style="margin-top: 15px;">© <?php echo date('Y'); ?> Ramirez Rent a Car. Todos los derechos reservados.</p>
+				</div>
+
+			</div>
+		</body>
+		</html>
+		<?php
+		$body = ob_get_clean();
+
+		$sent = wp_mail( $to, $subject, $body, $headers );
+
+		if ( $sent ) {
+			// Log audit log
+			$wpdb->insert( $wpdb->prefix . 'rrc_audit_log', [
+				'actor_user_id'   => get_current_user_id(),
+				'actor_type'      => 'user',
+				'action'          => 'SEND_CUSTOMER_EMAIL_MESSAGE',
+				'entity_type'     => 'reservation',
+				'entity_id'       => $id,
+				'new_values_json' => json_encode( [ 'message_length' => strlen( $message ) ] ),
+				'created_at'      => current_time( 'mysql' )
+			] );
+
+			return rest_ensure_response( [ 'success' => true, 'message' => 'Mensaje enviado correctamente al correo del cliente.' ] );
+		}
+
+		return new \WP_REST_Response( [ 'success' => false, 'message' => 'El servidor no pudo procesar el envío del correo.' ], 500 );
 	}
 }
