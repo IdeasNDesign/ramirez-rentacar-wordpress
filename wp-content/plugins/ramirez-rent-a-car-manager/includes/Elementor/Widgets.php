@@ -3517,26 +3517,6 @@ class Widgets {
 					<p class="rrc-terms-subtitle">
 						Este documento ha sido redactado conforme a las mejores prácticas generales en materia de alquiler, contratación electrónica, consumo, privacidad y comercio digital aplicables a operaciones en Honduras.
 					</p>
-
-					<!-- Alert label -->
-					<div class="rrc-terms-top-alert">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-						<span>Debe ser revisado y aprobado por asesoría legal en Honduras antes de su publicación definitiva.</span>
-					</div>
-				</div>
-
-				<!-- Warning Banner -->
-				<div class="rrc-terms-warning-panel">
-					<div class="rrc-terms-warning-icon">
-						<!-- Scales icon -->
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M21 7c0-2-4-2-4-2s-4 0-4 2 4 2 4 2 4 0 4-2z"></path><path d="M11 7c0-2-4-2-4-2s-4 0-4 2 4 2 4 2 4 0 4-2z"></path></svg>
-					</div>
-					<div class="rrc-terms-warning-content">
-						<h4 class="rrc-terms-warning-title">AVISO LEGAL IMPORTANTE</h4>
-						<p class="rrc-terms-warning-desc">
-							Este documento es un borrador con fines informativos y debe ser revisado, ajustado y aprobado por asesoría legal en Honduras antes de su publicación y aplicación. No constituye asesoría legal.
-						</p>
-					</div>
 				</div>
 
 				<!-- Grid layout -->
