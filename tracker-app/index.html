@@ -115,6 +115,9 @@
 
 			<div id="vehicleContainer" style="text-align: center; margin-bottom: 24px;"></div>
 
+			<!-- Warning alert for returning vehicle -->
+			<div id="returnWarningAlert" style="display:none; background:rgba(232,39,44,0.1); border:1px solid rgba(232,39,44,0.3); color:#f87171; padding:16px; border-radius:var(--radius-md); font-weight:800; font-size:13.5px; margin-bottom:24px; text-align:center; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 15px rgba(232,39,44,0.15); line-height:1.4;"></div>
+
 			<div class="details-grid">
 				<div class="detail-item">
 					<div class="detail-label">Cliente</div>
@@ -202,6 +205,15 @@
 			document.getElementById('priceTotal').innerText = `$${r.total_amount.toFixed(2)} USD`;
 			document.getElementById('priceDeposit').innerText = `$${r.deposit_paid.toFixed(2)} USD`;
 			document.getElementById('priceBalance').innerText = `$${r.remaining_balance.toFixed(2)} USD`;
+
+			// Warning alert for upcoming return when vehicle is checked out
+			const warningAlert = document.getElementById('returnWarningAlert');
+			if ((r.status === 'checked_out' || r.checked_out_at) && !r.returned_at) {
+				warningAlert.innerHTML = `⚠️ <strong>Recordatorio de Devolución:</strong> Debes entregar el vehículo el día <strong>${formatDateString(r.return_at)}</strong> en la sucursal de <strong>${r.return_location}</strong>.<br><em>¡Esperamos que estés disfrutando de la isla! 🌴</em>`;
+				warningAlert.style.display = 'block';
+			} else {
+				warningAlert.style.display = 'none';
+			}
 
 			// Vehicle Image
 			const imgContainer = document.getElementById('vehicleContainer');

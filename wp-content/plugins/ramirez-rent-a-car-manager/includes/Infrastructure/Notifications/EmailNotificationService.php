@@ -81,11 +81,7 @@ class EmailNotificationService {
 		$site_url      = esc_url( site_url() );
 
 		// Logo URL resolution
-		$custom_logo_id = get_theme_mod( 'custom_logo' );
-		$logo_url       = $custom_logo_id ? wp_get_attachment_image_url( $custom_logo_id, 'full' ) : '';
-		if ( ! $logo_url ) {
-			$logo_url = esc_url( get_site_icon_url( 180 ) );
-		}
+		$logo_url = 'https://ramirezrentacar.com/wp-content/uploads/2026/R-Rent-a-car-logo-app.png';
 
 		// Vehicle image
 		$vehicle_img = '';

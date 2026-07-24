@@ -135,7 +135,10 @@ class Routes {
 		
 		$wpdb->update( $table, [
 			'checked_out_at'     => current_time( 'mysql' ),
-			'reservation_status' => 'checked_out'
+			'reservation_status' => 'checked_out',
+			'payment_status'     => 'paid',
+			'remaining_balance'  => 0.00,
+			'amount_paid'        => $res->total_amount
 		], [ 'id' => $id ] );
 		
 		// Log audit
@@ -145,10 +148,27 @@ class Routes {
 			'action'          => 'DELIVER_VEHICLE',
 			'entity_type'     => 'reservation',
 			'entity_id'       => $id,
-			'old_values_json' => json_encode( [ 'checked_out_at' => $res->checked_out_at, 'reservation_status' => $res->reservation_status ] ),
-			'new_values_json' => json_encode( [ 'checked_out_at' => current_time( 'mysql' ), 'reservation_status' => 'checked_out' ] ),
+			'old_values_json' => json_encode( [ 
+				'checked_out_at'     => $res->checked_out_at, 
+				'reservation_status' => $res->reservation_status,
+				'payment_status'     => $res->payment_status,
+				'remaining_balance'  => $res->remaining_balance,
+				'amount_paid'        => $res->amount_paid
+			] ),
+			'new_values_json' => json_encode( [ 
+				'checked_out_at'     => current_time( 'mysql' ), 
+				'reservation_status' => 'checked_out',
+				'payment_status'     => 'paid',
+				'remaining_balance'  => 0.00,
+				'amount_paid'        => $res->total_amount
+			] ),
 			'created_at'      => current_time( 'mysql' )
 		] );
+
+		// Send friendly return reminder email to customer
+		if ( class_exists( '\\BreakTheMold\\RamirezPayPal\\Notifications\\CustomerVehicleDelivered' ) ) {
+			\BreakTheMold\RamirezPayPal\Notifications\CustomerVehicleDelivered::send( $id );
+		}
 		
 		return rest_ensure_response( [ 'success' => true, 'message' => 'Vehículo marcado como entregado.' ] );
 	}

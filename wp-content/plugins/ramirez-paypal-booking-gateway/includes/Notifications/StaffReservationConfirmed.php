@@ -83,6 +83,12 @@ class StaffReservationConfirmed {
 		</head>
 		<body style="font-family: sans-serif; color: #334155; line-height: 1.6; background-color: #f8fafc; padding: 20px;">
 			<div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+				
+				<!-- LOGO HEADER -->
+				<div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px;">
+					<img src="https://ramirezrentacar.com/wp-content/uploads/2026/R-Rent-a-car-logo-app.png" alt="Ramirez Rent a Car" style="max-height: 55px; display: inline-block;">
+				</div>
+
 				<h2 style="color: #E8272C; margin-top: 0; border-bottom: 2px solid #E8272C; padding-bottom: 10px;">Nueva Reserva Confirmada</h2>
 				<p>Se ha recibido y capturado con éxito el depósito del 10% mediante PayPal para la reserva <strong>#<?php echo esc_html( $res->public_reference ); ?></strong>.</p>
 				
