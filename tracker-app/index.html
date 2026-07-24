@@ -164,6 +164,16 @@
 			? '/ramirezrentacar/wp-json/ramirez-paypal/v1' 
 			: '/wp-json/ramirez-paypal/v1';
 
+		// Auto-load reservation by URL query param
+		window.addEventListener('DOMContentLoaded', () => {
+			const urlParams = new URLSearchParams(window.location.search);
+			const code = urlParams.get('code');
+			if (code) {
+				document.getElementById('resCode').value = code.trim();
+				document.getElementById('trackForm').dispatchEvent(new Event('submit'));
+			}
+		});
+
 		document.getElementById('trackForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const code = document.getElementById('resCode').value.trim();

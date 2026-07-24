@@ -241,7 +241,7 @@ class EmailNotificationService {
 							<!-- CALL TO ACTION BUTTON -->
 							<tr>
 								<td align="center" style="padding: 0 40px 40px 40px;">
-									<a href="<?php echo $site_url; ?>" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #E8272C 0%, #b91c1c 100%); color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; padding: 16px 36px; border-radius: 50px; box-shadow: 0 10px 20px rgba(232, 39, 44, 0.3); transition: all 0.3s ease;">
+									<a href="<?php echo esc_url( $site_url . '/tracker-app/?code=' . $reference ); ?>" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #E8272C 0%, #b91c1c 100%); color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; padding: 16px 36px; border-radius: 50px; box-shadow: 0 10px 20px rgba(232, 39, 44, 0.3); transition: all 0.3s ease;">
 										Ver / Gestionar mi Reserva →
 									</a>
 								</td>
