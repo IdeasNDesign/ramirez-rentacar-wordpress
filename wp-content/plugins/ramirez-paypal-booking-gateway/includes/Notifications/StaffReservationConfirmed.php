@@ -71,7 +71,7 @@ class StaffReservationConfirmed {
 		$deposit = number_format( (float) $res->deposit_paid_amount, 2 );
 		$balance = number_format( (float) $res->remaining_balance, 2 );
 
-		$admin_url = admin_url( 'admin.php?page=rrc-reservations' );
+		$admin_url = 'https://ramirezrentacar.com/operations-app/';
 
 		ob_start();
 		?>
