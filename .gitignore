@@ -8,6 +8,7 @@
 
 # Allow tracking the Operations App
 !/operations-app/
+!/tracker-app/
 
 # Allow tracking custom code inside wp-content
 !/wp-content/

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Seguimiento de Reserva - Ramirez Rent A Car</title>
+	<link rel="icon" type="image/png" href="../wp-content/uploads/2026/icon.png">
+	<link rel="shortcut icon" type="image/png" href="../wp-content/uploads/2026/icon.png">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-main: #07090e;
+			--bg-card: rgba(18, 24, 38, 0.7);
+			--brand-red: #E8272C;
+			--brand-red-glow: rgba(232, 39, 44, 0.4);
+			--brand-green: #10b981;
+			--brand-green-glow: rgba(16, 185, 129, 0.3);
+			--text-primary: #f8fafc;
+			--text-secondary: #94a3b8;
+			--border-color: rgba(255, 255, 255, 0.08);
+			--radius-xl: 24px;
+			--radius-lg: 16px;
+			--radius-md: 12px;
+			--glass-border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter Tight', sans-serif; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+		body { background: radial-gradient(circle at top right, #1a080a 0%, #07090e 60%); color: var(--text-primary); -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+
+		.tracker-container { width: 100%; max-width: 650px; background: rgba(13, 17, 26, 0.85); backdrop-filter: blur(20px); border: var(--glass-border); padding: 40px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); }
+		.logo-header { text-align: center; margin-bottom: 30px; }
+		.logo-header img { max-height: 55px; object-fit: contain; }
+		.logo-header p { color: var(--text-secondary); font-size: 14px; margin-top: 8px; }
+
+		.form-group { margin-bottom: 20px; text-align: left; }
+		.form-group label { display: block; font-size: 12px; font-weight: 800; margin-bottom: 8px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; }
+		.form-group input { width: 100%; padding: 16px; background: rgba(18, 24, 38, 0.9); border: var(--glass-border); color: #fff; border-radius: var(--radius-md); font-size: 15px; outline: none; }
+		.form-group input:focus { border-color: var(--brand-red); box-shadow: 0 0 15px var(--brand-red-glow); }
+
+		.btn-track { display: block; width: 100%; text-align: center; background: var(--brand-red); color: #fff; font-weight: 800; padding: 16px; border-radius: var(--radius-md); text-decoration: none; border: none; cursor: pointer; font-size: 16px; box-shadow: 0 8px 20px -4px var(--brand-red-glow); }
+		.btn-track:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+		/* TRACKING PROGRESS STEPS */
+		.tracking-steps { display: flex; justify-content: space-between; margin-top: 30px; margin-bottom: 40px; position: relative; }
+		.tracking-steps::before { content: ''; position: absolute; top: 15px; left: 10%; right: 10%; height: 4px; background: rgba(255,255,255,0.08); z-index: 1; }
+		.step-line-progress { position: absolute; top: 15px; left: 10%; width: 0%; height: 4px; background: var(--brand-green); z-index: 2; transition: width 0.8s ease-in-out; }
+		
+		.step-node { text-align: center; width: 22%; z-index: 3; position: relative; }
+		.step-circle { width: 34px; height: 34px; border-radius: 50%; background: #121826; border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; font-size: 14px; color: var(--text-secondary); font-weight: bold; }
+		.step-node.active .step-circle { background: var(--brand-green); border-color: var(--brand-green); color: #fff; box-shadow: 0 0 15px var(--brand-green-glow); }
+		.step-node.current .step-circle { background: var(--brand-red); border-color: var(--brand-red); color: #fff; box-shadow: 0 0 15px var(--brand-red-glow); }
+		.step-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
+		.step-node.active .step-label, .step-node.current .step-label { color: #fff; }
+
+		/* RESERVATION DETAIL CARD */
+		.res-details-card { display: none; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 30px; }
+		.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+		.detail-item { background: rgba(18, 24, 38, 0.4); padding: 16px; border-radius: var(--radius-md); border: var(--glass-border); }
+		.detail-label { font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+		.detail-value { font-size: 15px; font-weight: 700; color: #fff; }
+
+		.financial-card { grid-column: span 2; background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(18, 24, 38, 0.6) 100%); border: 1px solid rgba(16, 185, 129, 0.2); }
+		.price-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+		.price-row.total { border-top: 1px dashed rgba(255,255,255,0.1); margin-top: 10px; padding-top: 12px; font-weight: 900; font-size: 18px; }
+		
+		.btn-new-search { background: none; border: 1px solid rgba(255,255,255,0.15); color: var(--text-secondary); padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer; display: block; margin: 30px auto 0 auto; }
+		.btn-new-search:hover { border-color: #fff; color: #fff; }
+
+		.error-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 16px; border-radius: var(--radius-md); text-align: center; margin-top: 20px; font-weight: 700; font-size: 14px; }
+	</style>
+</head>
+<body>
+
+	<div class="tracker-container">
+		<div class="logo-header">
+			<img src="../wp-content/uploads/2026/R-Rent-a-car-logo-app.png" alt="Ramirez Rent A Car">
+			<p>Seguimiento e Información de tu Reserva</p>
+		</div>
+
+		<!-- SEARCH FORM -->
+		<form id="trackForm">
+			<div class="form-group">
+				<label>Código de Reserva</label>
+				<input type="text" id="resCode" required placeholder="ej: RRC-GAPHNBBE" autocomplete="off">
+			</div>
+			<div class="form-group">
+				<label>Correo Electrónico</label>
+				<input type="email" id="resEmail" required placeholder="ej: tuemail@correo.com" autocomplete="off">
+			</div>
+			<button type="submit" class="btn-track">Buscar Reserva</button>
+		</form>
+
+		<div id="errorBox" class="error-box"></div>
+
+		<!-- TRACKER INTERFACE -->
+		<div id="resDetails" class="res-details-card">
+			<div class="tracking-steps">
+				<div class="step-line-progress" id="progressLine"></div>
+				
+				<div class="step-node" id="step1">
+					<div class="step-circle">1</div>
+					<div class="step-label">Recibida</div>
+				</div>
+				<div class="step-node" id="step2">
+					<div class="step-circle">2</div>
+					<div class="step-label">Confirmada</div>
+				</div>
+				<div class="step-node" id="step3">
+					<div class="step-circle">3</div>
+					<div class="step-label">Entregado</div>
+				</div>
+				<div class="step-node" id="step4">
+					<div class="step-circle">4</div>
+					<div class="step-label">Finalizado</div>
+				</div>
+			</div>
+
+			<div id="vehicleContainer" style="text-align: center; margin-bottom: 24px;"></div>
+
+			<div class="details-grid">
+				<div class="detail-item">
+					<div class="detail-label">Cliente</div>
+					<div class="detail-value" id="valCustomer">...</div>
+				</div>
+				<div class="detail-item">
+					<div class="detail-label">Código Oficial</div>
+					<div class="detail-value" id="valRef" style="color: var(--brand-red);">...</div>
+				</div>
+				
+				<div class="detail-item">
+					<div class="detail-label">Entrega (Retiro)</div>
+					<div class="detail-value" id="valPickup">...</div>
+				</div>
+				<div class="detail-item">
+					<div class="detail-label">Devolución</div>
+					<div class="detail-value" id="valReturn">...</div>
+				</div>
+
+				<div class="detail-item financial-card">
+					<div class="detail-label" style="margin-bottom: 12px; color: var(--brand-green);">Desglose del Alquiler (USD)</div>
+					<div class="price-row">
+						<span>Total Alquiler:</span>
+						<span id="priceTotal" style="font-weight:700;">$0.00</span>
+					</div>
+					<div class="price-row" style="color: #4ade80;">
+						<span>Depósito Cobrado (10%):</span>
+						<span id="priceDeposit" style="font-weight:800;">$0.00</span>
+					</div>
+					<div class="price-row" style="color: #f87171; border-top: 1px dashed rgba(255,255,255,0.08); margin-top: 6px; padding-top: 10px;">
+						<span>Saldo Pendiente (a pagar al retirar):</span>
+						<span id="priceBalance" style="font-weight:900; font-size:16px;">$0.00</span>
+					</div>
+				</div>
+			</div>
+
+			<button onclick="resetSearch()" class="btn-new-search">Realizar Otra Búsqueda</button>
+		</div>
+	</div>
+
+	<script>
+		// Dynamic API Base URL detection
+		const API_BASE = window.location.pathname.includes('/ramirezrentacar/') 
+			? '/ramirezrentacar/wp-json/ramirez-paypal/v1' 
+			: '/wp-json/ramirez-paypal/v1';
+
+		document.getElementById('trackForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const code = document.getElementById('resCode').value.trim();
+			const email = document.getElementById('resEmail').value.trim();
+			const errorBox = document.getElementById('errorBox');
+			const detailsCard = document.getElementById('resDetails');
+
+			errorBox.style.display = 'none';
+
+			try {
+				const response = await fetch(`${API_BASE}/tracker`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ reference: code, email: email })
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					document.getElementById('trackForm').style.display = 'none';
+					renderDetails(data.reservation);
+				} else {
+					errorBox.innerText = data.message || 'No se pudo encontrar la reserva.';
+					errorBox.style.display = 'block';
+				}
+			} catch (err) {
+				errorBox.innerText = 'Error de conexión con el servidor. Inténtalo de nuevo.';
+				errorBox.style.display = 'block';
+			}
+		});
+
+		function renderDetails(r) {
+			document.getElementById('valCustomer').innerText = r.customer_name;
+			document.getElementById('valRef').innerText = `#${r.reference}`;
+			
+			// Format dates cleanly without timezone shift
+			document.getElementById('valPickup').innerHTML = `<strong>${r.pickup_location}</strong><br><span style="font-size:13px; color:var(--text-secondary); font-weight:normal;">${formatDateString(r.pickup_at)}</span>`;
+			document.getElementById('valReturn').innerHTML = `<strong>${r.return_location}</strong><br><span style="font-size:13px; color:var(--text-secondary); font-weight:normal;">${formatDateString(r.return_at)}</span>`;
+			
+			document.getElementById('priceTotal').innerText = `$${r.total_amount.toFixed(2)} USD`;
+			document.getElementById('priceDeposit').innerText = `$${r.deposit_paid.toFixed(2)} USD`;
+			document.getElementById('priceBalance').innerText = `$${r.remaining_balance.toFixed(2)} USD`;
+
+			// Vehicle Image
+			const imgContainer = document.getElementById('vehicleContainer');
+			if (r.vehicle_image) {
+				imgContainer.innerHTML = `<img src="${r.vehicle_image}" alt="${r.vehicle_name}" style="max-width:100%; height:130px; object-fit:contain; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.5));">`;
+			} else {
+				imgContainer.innerHTML = `<div style="font-size:24px; font-weight:800; color:#fff; padding:20px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed rgba(255,255,255,0.1);">${r.vehicle_name}</div>`;
+			}
+
+			// Render step progress
+			updateStepProgress(r.status, r.checked_out_at, r.returned_at);
+
+			document.getElementById('resDetails').style.display = 'block';
+		}
+
+		function updateStepProgress(status, checkedOut, returned) {
+			const steps = ['step1', 'step2', 'step3', 'step4'];
+			steps.forEach(s => {
+				document.getElementById(s).classList.remove('active', 'current');
+			});
+
+			const progressLine = document.getElementById('progressLine');
+
+			// Check state rules
+			if (returned) {
+				// Step 4 Complete (Finished)
+				steps.forEach(s => document.getElementById(s).classList.add('active'));
+				document.getElementById('step4').classList.add('current');
+				progressLine.style.width = '80%';
+			} else if (checkedOut || status === 'checked_out') {
+				// Step 3 Complete (Delivered/Checked Out)
+				document.getElementById('step1').classList.add('active');
+				document.getElementById('step2').classList.add('active');
+				document.getElementById('step3').classList.add('active', 'current');
+				progressLine.style.width = '53%';
+			} else if (status === 'CONFIRMED' || status === 'confirmed' || status === 'paid') {
+				// Step 2 Complete (Confirmed/Paid)
+				document.getElementById('step1').classList.add('active');
+				document.getElementById('step2').classList.add('active', 'current');
+				progressLine.style.width = '26%';
+			} else {
+				// Step 1 Active (Received)
+				document.getElementById('step1').classList.add('active', 'current');
+				progressLine.style.width = '0%';
+			}
+		}
+
+		function formatDateString(dateStr) {
+			if (!dateStr) return '';
+			const parts = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+			if (!parts) return dateStr;
+			
+			const year = parseInt(parts[1], 10);
+			const month = parseInt(parts[2], 10) - 1;
+			const day = parseInt(parts[3], 10);
+			const hour = parseInt(parts[4], 10);
+			const minute = parts[5];
+			
+			const date = new Date(year, month, day, hour, parseInt(minute, 10));
+			
+			const weekdays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+			const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+			
+			const ampm = hour >= 12 ? 'PM' : 'AM';
+			const displayHour = hour % 12 || 12;
+			
+			return `${weekdays[date.getDay()]}, ${day} ${months[date.getMonth()]} - ${displayHour}:${minute} ${ampm}`;
+		}
+
+		function resetSearch() {
+			document.getElementById('resCode').value = '';
+			document.getElementById('resEmail').value = '';
+			document.getElementById('resDetails').style.display = 'none';
+			document.getElementById('trackForm').style.display = 'block';
+		}
+	</script>
+</body>
+</html>
