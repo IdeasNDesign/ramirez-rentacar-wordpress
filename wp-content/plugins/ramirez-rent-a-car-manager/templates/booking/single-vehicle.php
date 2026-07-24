@@ -1261,7 +1261,7 @@ document.addEventListener('DOMContentLoaded', function() {
 									// Add click handler to close the modal
 									document.getElementById('closeSuccessModalBtn').addEventListener('click', () => {
 										modalOverlay.remove();
-										window.location.reload();
+										window.location.href = 'https://ramirezrentacar.com/';
 									});
 								} else {
 									alert('Error al verificar la captura: ' + captureData.message);
