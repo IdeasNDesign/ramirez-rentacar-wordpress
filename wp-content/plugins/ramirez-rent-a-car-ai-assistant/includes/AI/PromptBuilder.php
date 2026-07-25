@@ -58,31 +58,21 @@ class PromptBuilder {
 			],
 			'body'    => wp_json_encode([
 				'messages'    => $messages,
-				'model'       => 'llama-3.3-70b-specdec', // Fast versatile model on Groq
+				'model'       => 'llama-3.3-70b-versatile', // Active Llama 3.3 model on Groq
 				'temperature' => 0.2
 			]),
 			'timeout' => 30
 		]);
 
 		if ( is_wp_error( $response ) ) {
-			return "Lo siento, estoy teniendo un inconveniente técnico temporal para conectarse: " . esc_html( $response->get_error_message() );
+			return "Lo siento, estoy teniendo un inconveniente técnico temporal para conectarse. ¿Podrías intentar de nuevo?";
 		}
 
 		$body  = wp_remote_retrieve_body( $response );
 		$data  = json_decode( $body, true );
-		
-		// Return API error details directly in chat for diagnostic
-		if ( isset( $data['error']['message'] ) ) {
-			return "Error de la API de Groq: " . esc_html( $data['error']['message'] ) . " (Tipo: " . esc_html( $data['error']['type'] ?? 'N/A' ) . ")";
-		}
-		
 		$reply = $data['choices'][0]['message']['content'] ?? '';
 		
-		if ( empty( $reply ) ) {
-			return "Respuesta de Groq vacía. Código de respuesta: " . wp_remote_retrieve_response_code( $response ) . ". Datos: " . esc_html( substr( $body, 0, 300 ) );
-		}
-		
-		return trim( $reply );
+		return trim( $reply ) ?: "Lo siento, no pude procesar tu solicitud en este momento.";
 	}
 
 	private static function call_gemini_fallback( string $system_prompt, string $user_message, array $history = [] ): string {
