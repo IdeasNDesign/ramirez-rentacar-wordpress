@@ -773,8 +773,9 @@ $ac_status = $model->air_conditioning ? 'Air Conditioner' : 'Manual A/C';
 		<!-- COLUMNA DERECHA -->
 		<div class="rrc-card-right">
 			
-			<div class="rrc-brand-logo-container">
+			<div class="rrc-brand-logo-container" style="margin-bottom: 20px;">
 				<div class="rrc-brand-model"><?php echo esc_html($model->model ?: $model->public_name); ?></div>
+				<div style="font-size: 15px; color: #E8272C; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">o modelos similares</div>
 			</div>
 
 			<!-- Persuasive description (ideal for families or couples exploring Roatan) -->

@@ -340,7 +340,8 @@ class Widgets {
 							<div style="<?php echo esc_attr($img_style); ?> background-image: url('<?php echo esc_url($img_url); ?>');"></div>
 							
 							<!-- Car Title -->
-							<h3 style="margin: 0 0 4px 0; font-size: 17px; font-weight: 900; color: #1e293b; font-family: 'Inter Tight', sans-serif;"><?php echo esc_html( $model->public_name ); ?></h3>
+							<h3 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 900; color: #1e293b; font-family: 'Inter Tight', sans-serif;"><?php echo esc_html( $model->public_name ); ?></h3>
+							<div style="font-size: 11.5px; color: #E8272C; font-weight: 800; margin-bottom: 6px; text-transform: uppercase; font-family: 'Inter Tight', sans-serif;">o modelos similares</div>
 							
 							<!-- Year / Subtitle -->
 							<div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px; font-weight: 600;"><?php echo esc_html( $model->year ?: 'Modelo Garantizado' ); ?></div>
@@ -773,9 +774,10 @@ class Widgets {
 								SPECIAL Cruise Ship 1 day Price!
 							</div>
 							
-							<h3 style="margin: 0 0 4px 0; font-size: 36px; font-weight: 900; color: #1e293b; text-transform: uppercase; line-height: 1.1; font-family: 'Inter Tight', sans-serif;">
+							<h3 style="margin: 0 0 2px 0; font-size: 36px; font-weight: 900; color: #1e293b; text-transform: uppercase; line-height: 1.1; font-family: 'Inter Tight', sans-serif;">
 								<?php echo esc_html( $model->public_name ); ?>
 							</h3>
+							<div style="font-size: 13px; color: #E8272C; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter Tight', sans-serif;">o modelos similares</div>
 							
 							<div style="font-size: 12px; color: #94a3b8; font-weight: 600; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
 								<?php echo esc_html( $model->year ?: 'Modelo Garantizado' ); ?> &bull; <span style="color: #64748b;"><?php echo esc_html( $model->category ); ?></span>
