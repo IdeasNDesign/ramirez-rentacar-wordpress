@@ -2,7 +2,7 @@
 namespace BreakTheMold\RamirezAIAssistant\AI;
 
 /**
- * Prompt Builder and AI service connector.
+ * Prompt Builder and AI service connector for Groq Cloud.
  * Author: Break The Mold
  */
 class PromptBuilder {
@@ -21,15 +21,15 @@ class PromptBuilder {
 	}
 
 	public static function call_ai( string $system_prompt, string $user_message, array $history = [] ): string {
-		// 1. Try to get Grok API Key from WordPress constants or options
-		$grok_key = defined( 'GROK_API_KEY' ) ? GROK_API_KEY : get_option( 'rrc_grok_api_key' );
+		// 1. Try to get Groq API Key from WordPress constants or options
+		$groq_key = defined( 'GROQ_API_KEY' ) ? GROQ_API_KEY : get_option( 'rrc_groq_api_key' );
 
-		if ( empty( $grok_key ) ) {
-			// Fallback to Gemini if no Grok key is configured
+		if ( empty( $groq_key ) ) {
+			// Fallback to Gemini if no Groq key is configured
 			return self::call_gemini_fallback( $system_prompt, $user_message, $history );
 		}
 
-		$url = "https://api.x.ai/v1/chat/completions";
+		$url = "https://api.groq.com/openai/v1/chat/completions";
 		
 		$messages = [];
 		$messages[] = [
@@ -54,11 +54,11 @@ class PromptBuilder {
 		$response = wp_remote_post( $url, [
 			'headers' => [ 
 				'Content-Type'  => 'application/json',
-				'Authorization' => 'Bearer ' . $grok_key
+				'Authorization' => 'Bearer ' . $groq_key
 			],
 			'body'    => wp_json_encode([
 				'messages'    => $messages,
-				'model'       => 'grok-2-1212', // Latest Grok 2 model
+				'model'       => 'llama-3.3-70b-specdec', // Fast versatile model on Groq
 				'temperature' => 0.2
 			]),
 			'timeout' => 30
